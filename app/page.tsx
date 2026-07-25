@@ -2,19 +2,28 @@
 
 import { useState } from "react";
 
+type BusinessDirection = {
+  strongestSkill: string;
+  customer: string;
+  problem: string;
+  businessIdea: string;
+  firstOffer: string;
+  nextAction: string;
+};
+
 export default function Home() {
   const [started, setStarted] = useState(false);
   const [skills, setSkills] = useState("");
-  const [generated, setGenerated] = useState(false);
+  const [direction, setDirection] = useState<BusinessDirection | null>(null);
 
-  if (generated) {
+  if (direction) {
   return (
     <main className="min-h-screen bg-gradient-to-b from-white to-violet-50/40 px-6 py-8">
       <div className="mx-auto w-full max-w-5xl">
         <header className="grid grid-cols-3 items-center">
           <button
             type="button"
-            onClick={() => setGenerated(false)}
+            onClick={() => setDirection(null)}
             className="justify-self-start rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-950"
           >
             ← Back
@@ -46,39 +55,39 @@ export default function Home() {
           <div className="mt-12 space-y-5">
             <ResultCard
               label="Your strongest skill"
-              value={skills}
+              value={direction.strongestSkill}
             />
 
             <ResultCard
               label="Possible customer"
-              value="People or small businesses that need this skill but do not have the time, knowledge or resources to do it themselves."
+              value={direction.customer}
             />
 
             <ResultCard
               label="Problem you could solve"
-              value="Help your customer obtain a useful result faster, more simply and with less risk."
+              value={direction.problem}
             />
 
             <ResultCard
               label="First business idea"
-              value="Turn your skill into a small, clearly defined service that solves one specific problem for one specific type of customer."
+              value={direction.businessIdea}
             />
 
             <ResultCard
               label="First offer"
-              value="A simple starter service with a fixed result, a clear delivery time and an accessible initial price."
+              value={direction.firstOffer}
             />
 
             <ResultCard
               label="Your next action"
-              value="Write the name of one real person who could benefit from this service and contact them today."
+              value={direction.nextAction}
             />
           </div>
 
           <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:justify-center">
             <button
               type="button"
-              onClick={() => setGenerated(false)}
+              onClick={() => setDirection(null)}
               className="rounded-2xl border border-slate-300 bg-white px-7 py-4 text-base font-semibold text-slate-700 transition hover:border-slate-400 hover:bg-slate-50"
             >
               Edit my skills
@@ -193,13 +202,16 @@ export default function Home() {
           <form
             className="mt-10"
             onSubmit={(event) => {
-                event.preventDefault();
+              event.preventDefault();
 
-                if (!skills.trim()) {
-                  return;
-                }
+              const normalizedSkills = skills.trim();
 
-                setGenerated(true);
+              if (!normalizedSkills) {
+                return;
+              }
+
+              const result = buildBusinessDirection(normalizedSkills);
+              setDirection(result);
             }}
           >
             <label htmlFor="skills" className="sr-only">
@@ -253,4 +265,106 @@ function ResultCard({ label, value }: ResultCardProps) {
       </p>
     </article>
   );
+}
+
+function buildBusinessDirection(skills: string): BusinessDirection {
+  const normalized = skills.toLowerCase();
+
+  if (
+    normalized.includes("software") ||
+    normalized.includes("developer") ||
+    normalized.includes("programming") ||
+    normalized.includes("code")
+  ) {
+    return {
+      strongestSkill: skills,
+      customer:
+        "Small businesses and independent professionals that need simple digital tools but cannot hire a full development team.",
+      problem:
+        "Many small organizations still manage repetitive work manually because custom software appears too expensive or complicated.",
+      businessIdea:
+        "Create small, focused software solutions that automate one repetitive business process at a time.",
+      firstOffer:
+        "A fixed-price workflow automation delivered in seven days, starting with a free 30-minute process review.",
+      nextAction:
+        "Contact one small business owner today and ask which repetitive task consumes the most time every week.",
+    };
+  }
+
+  if (
+    normalized.includes("teach") ||
+    normalized.includes("teacher") ||
+    normalized.includes("training") ||
+    normalized.includes("education")
+  ) {
+    return {
+      strongestSkill: skills,
+      customer:
+        "Students or professionals who need practical help understanding a specific subject.",
+      problem:
+        "People often have access to information but lack a clear, personalized learning path.",
+      businessIdea:
+        "Offer short, outcome-based learning programs focused on one specific result.",
+      firstOffer:
+        "A one-hour individual session that helps the customer understand or complete one clearly defined task.",
+      nextAction:
+        "Choose one topic you can teach confidently and offer a free pilot session to one real person today.",
+    };
+  }
+
+  if (
+    normalized.includes("cook") ||
+    normalized.includes("baking") ||
+    normalized.includes("chef") ||
+    normalized.includes("food")
+  ) {
+    return {
+      strongestSkill: skills,
+      customer:
+        "Busy people who want high-quality homemade food or practical guidance in the kitchen.",
+      problem:
+        "Many people want healthier or more personal food experiences but lack time, confidence or preparation skills.",
+      businessIdea:
+        "Turn your cooking expertise into a focused local service, workshop or digital product.",
+      firstOffer:
+        "A small paid cooking experience for a limited group, centred on one recipe or one specific need.",
+      nextAction:
+        "Select one dish people regularly appreciate and ask five contacts whether they would pay for it or learn how to make it.",
+    };
+  }
+
+  if (
+    normalized.includes("design") ||
+    normalized.includes("photo") ||
+    normalized.includes("video") ||
+    normalized.includes("creative")
+  ) {
+    return {
+      strongestSkill: skills,
+      customer:
+        "Independent professionals and small businesses that need a stronger visual presence.",
+      problem:
+        "Small organizations often struggle to communicate their value clearly and consistently.",
+      businessIdea:
+        "Create a productized creative service with a clear deliverable, fixed deadline and fixed price.",
+      firstOffer:
+        "A starter visual package containing one clearly defined result, delivered within five working days.",
+      nextAction:
+        "Find one local professional whose online presence could be improved and prepare a small example for them today.",
+    };
+  }
+
+  return {
+    strongestSkill: skills,
+    customer:
+      "People or small businesses that need your expertise but lack the time, knowledge or resources to obtain the same result independently.",
+    problem:
+      "Your potential customer needs a useful result that you can deliver faster, more clearly or with less risk.",
+    businessIdea:
+      "Transform your experience into a narrowly defined service for one specific type of customer and one specific problem.",
+    firstOffer:
+      "A small starter service with a clear result, a fixed delivery time and a simple initial price.",
+    nextAction:
+      "Identify one real person who might benefit from your skill and ask them about their current problem today.",
+  };
 }
