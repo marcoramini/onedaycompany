@@ -5,6 +5,97 @@ import { useState } from "react";
 export default function Home() {
   const [started, setStarted] = useState(false);
   const [skills, setSkills] = useState("");
+  const [generated, setGenerated] = useState(false);
+
+  if (generated) {
+  return (
+    <main className="min-h-screen bg-gradient-to-b from-white to-violet-50/40 px-6 py-8">
+      <div className="mx-auto w-full max-w-5xl">
+        <header className="grid grid-cols-3 items-center">
+          <button
+            type="button"
+            onClick={() => setGenerated(false)}
+            className="justify-self-start rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-950"
+          >
+            ← Back
+          </button>
+
+          <div className="justify-self-center text-lg font-bold tracking-tight text-slate-950 sm:text-xl">
+            OneDayCompany
+          </div>
+
+          <div />
+        </header>
+
+        <section className="mx-auto mt-14 max-w-3xl sm:mt-20">
+          <div className="text-center">
+            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-violet-600">
+              Your first business direction
+            </p>
+
+            <h1 className="mt-4 text-4xl font-bold tracking-tight text-slate-950 sm:text-6xl">
+              Your skills can become a business.
+            </h1>
+
+            <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-slate-600">
+              This is not a complete business plan. It is your first concrete
+              direction.
+            </p>
+          </div>
+
+          <div className="mt-12 space-y-5">
+            <ResultCard
+              label="Your strongest skill"
+              value={skills}
+            />
+
+            <ResultCard
+              label="Possible customer"
+              value="People or small businesses that need this skill but do not have the time, knowledge or resources to do it themselves."
+            />
+
+            <ResultCard
+              label="Problem you could solve"
+              value="Help your customer obtain a useful result faster, more simply and with less risk."
+            />
+
+            <ResultCard
+              label="First business idea"
+              value="Turn your skill into a small, clearly defined service that solves one specific problem for one specific type of customer."
+            />
+
+            <ResultCard
+              label="First offer"
+              value="A simple starter service with a fixed result, a clear delivery time and an accessible initial price."
+            />
+
+            <ResultCard
+              label="Your next action"
+              value="Write the name of one real person who could benefit from this service and contact them today."
+            />
+          </div>
+
+          <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:justify-center">
+            <button
+              type="button"
+              onClick={() => setGenerated(false)}
+              className="rounded-2xl border border-slate-300 bg-white px-7 py-4 text-base font-semibold text-slate-700 transition hover:border-slate-400 hover:bg-slate-50"
+            >
+              Edit my skills
+            </button>
+
+            <button
+              type="button"
+              className="rounded-2xl bg-slate-950 px-7 py-4 text-base font-semibold text-white transition hover:-translate-y-0.5 hover:bg-slate-800"
+            >
+              Build my business plan →
+            </button>
+          </div>
+        </section>
+      </div>
+    </main>
+  );
+}
 
   if (!started) {
     return (
@@ -102,13 +193,13 @@ export default function Home() {
           <form
             className="mt-10"
             onSubmit={(event) => {
-              event.preventDefault();
+                event.preventDefault();
 
-              if (!skills.trim()) {
-                return;
-              }
+                if (!skills.trim()) {
+                  return;
+                }
 
-              console.log("Skills:", skills);
+                setGenerated(true);
             }}
           >
             <label htmlFor="skills" className="sr-only">
@@ -142,5 +233,24 @@ export default function Home() {
         </section>
       </div>
     </main>
+  );
+}
+
+type ResultCardProps = {
+  label: string;
+  value: string;
+};
+
+function ResultCard({ label, value }: ResultCardProps) {
+  return (
+    <article className="rounded-3xl border border-violet-100 bg-white p-6 shadow-sm sm:p-8">
+      <p className="text-sm font-semibold uppercase tracking-[0.16em] text-violet-600">
+        {label}
+      </p>
+
+      <p className="mt-3 text-lg leading-8 text-slate-700">
+        {value}
+      </p>
+    </article>
   );
 }
