@@ -37,7 +37,7 @@ export default function Landing({ onStart }: LandingProps) {
           <div className="mx-auto mt-10 h-px w-20 bg-violet-200" />
 
           <h1 className="mx-auto mt-10 max-w-4xl text-5xl font-bold tracking-tight text-slate-950 sm:text-6xl lg:text-7xl">
-            Launch your business.
+            Launch your new business.
           </h1>
 
           <p className="mx-auto mt-8 max-w-3xl text-lg leading-8 text-slate-600 sm:text-xl">
