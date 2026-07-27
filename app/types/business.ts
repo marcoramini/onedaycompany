@@ -1,8 +1,8 @@
 export type BusinessDirection = {
-  strongestSkill: string;
+  id: string;
+  title: string;
   customer: string;
-  problem: string;
-  businessIdea: string;
-  firstOffer: string;
-  nextAction: string;
+  valueCreated: string;
+  credibility: string;
+  testability: string;
 };

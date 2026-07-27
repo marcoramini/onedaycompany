@@ -3,84 +3,87 @@
 import { useState } from "react";
 
 import Architect from "./components/Architect";
-import BusinessDirectionScreen from "./components/BusinessDirectionScreen";
+import BusinessOpportunitiesScreen from "./components/BusinessOpportunitiesScreen";
 import Landing from "./components/Landing";
 import SkillsForm from "./components/SkillsForm";
-import { buildBusinessDirection } from "./lib/businessGenerator";
+import { buildBusinessDirections } from "./lib/businessGenerator";
 import type { BusinessDirection } from "./types/business";
 
+type WorkflowStep =
+  | "landing"
+  | "skills"
+  | "opportunities"
+  | "architect";
+
 export default function Home() {
-  const [started, setStarted] = useState(false);
+  const [step, setStep] = useState<WorkflowStep>("landing");
   const [skills, setSkills] = useState("");
-  const [direction, setDirection] =
+  const [directions, setDirections] = useState<BusinessDirection[]>([]);
+  const [selectedDirection, setSelectedDirection] =
     useState<BusinessDirection | null>(null);
-  const [businessPlan, setBusinessPlan] = useState(false);
 
   function handleStart() {
-    setStarted(true);
+    setStep("skills");
   }
 
   function handleReturnToLanding() {
-    setStarted(false);
-    setDirection(null);
-    setBusinessPlan(false);
+    setStep("landing");
+    setDirections([]);
+    setSelectedDirection(null);
   }
 
-  function handleGenerateDirection() {
+  function handleGenerateDirections() {
     const normalizedSkills = skills.trim();
 
     if (!normalizedSkills) {
       return;
     }
 
-    const result = buildBusinessDirection(normalizedSkills);
-
-    setDirection(result);
-    setBusinessPlan(false);
+    setDirections(buildBusinessDirections(normalizedSkills));
+    setSelectedDirection(null);
+    setStep("opportunities");
   }
 
   function handleEditSkills() {
-    setDirection(null);
-    setBusinessPlan(false);
+    setDirections([]);
+    setSelectedDirection(null);
+    setStep("skills");
   }
 
-  function handleBuildBusinessPlan() {
-    if (!direction) {
-      return;
-    }
-
-    setBusinessPlan(true);
+  function handleChooseDirection(direction: BusinessDirection) {
+    setSelectedDirection(direction);
+    setStep("architect");
   }
 
-  function handleReturnToDirection() {
-    setBusinessPlan(false);
+  function handleReturnToOpportunities() {
+    setSelectedDirection(null);
+    setStep("opportunities");
   }
 
-  if (businessPlan && direction) {
-    return <Architect onBack={handleReturnToDirection} />;
+  if (step === "architect" && selectedDirection) {
+    return <Architect onBack={handleReturnToOpportunities} />;
   }
 
-  if (direction) {
+  if (step === "opportunities") {
     return (
-      <BusinessDirectionScreen
-        direction={direction}
+      <BusinessOpportunitiesScreen
+        directions={directions}
         onBack={handleEditSkills}
-        onEditSkills={handleEditSkills}
-        onBuildBusinessPlan={handleBuildBusinessPlan}
+        onChooseDirection={handleChooseDirection}
       />
     );
   }
 
-  if (!started) {
-    return <Landing onStart={handleStart} />;
+  if (step === "skills") {
+    return (
+      <SkillsForm
+        skills={skills}
+        onSkillsChange={setSkills}
+        onBack={handleReturnToLanding}
+        onSubmit={handleGenerateDirections}
+      />
+    );
   }
 
-  return (
-    <SkillsForm
-      skills={skills}
-      onSkillsChange={setSkills}
-      onBack={handleReturnToLanding}
-      onSubmit={handleGenerateDirection}
-    />
-  );
+  return <Landing onStart={handleStart} />;
 }
