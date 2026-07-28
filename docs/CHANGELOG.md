@@ -8,15 +8,24 @@ The format is intentionally lightweight.
 
 ### Added
 
-- Initial project documentation system:
-  - Project Brief
-  - Vision
-  - Architecture
-  - Decisions
-  - Roadmap
-  - Chat Handoff
-  - AI Collaboration Protocol
-  - Session Template
+- AI-backed Business Opportunity generation through a server-side Next.js API route.
+- OpenAI Responses API integration with strict structured output.
+- Zod schemas for request and generated opportunity validation.
+- Deterministic fallback generation when the provider is unavailable or returns invalid data.
+- Generation source metadata: `ai` or `fallback`.
+- Loading, retry and recoverable error states in the skills workflow.
+- Optional `LOCAL_PROXY_URL` support for local corporate development through an NTLM bridge such as CNTLM.
+
+### Changed
+
+- Replaced direct generation calls in the UI with `businessOpportunityService`.
+- Evolved the workflow from one Business Direction to three selectable Business Opportunities.
+- Kept proxy configuration environment-specific so Vercel connects directly.
+
+### Security
+
+- OpenAI credentials remain server-side.
+- NTLM credentials and corporate proxy configuration are excluded from application code and Vercel.
 
 ## Initial prototype
 

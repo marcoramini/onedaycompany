@@ -18,7 +18,7 @@ function createDirection(
   };
 }
 
-export function buildBusinessDirections(
+export function generateFallbackBusinessDirections(
   skills: string,
 ): BusinessDirection[] {
   const normalized = skills.toLowerCase();

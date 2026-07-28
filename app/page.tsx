@@ -6,7 +6,7 @@ import Architect from "./components/Architect";
 import BusinessOpportunitiesScreen from "./components/BusinessOpportunitiesScreen";
 import Landing from "./components/Landing";
 import SkillsForm from "./components/SkillsForm";
-import { buildBusinessDirections } from "./lib/businessGenerator";
+import { generateBusinessDirections } from "./lib/businessOpportunityService";
 import type { BusinessDirection } from "./types/business";
 
 type WorkflowStep =
@@ -21,6 +21,10 @@ export default function Home() {
   const [directions, setDirections] = useState<BusinessDirection[]>([]);
   const [selectedDirection, setSelectedDirection] =
     useState<BusinessDirection | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generationError, setGenerationError] = useState<string | null>(
+    null,
+  );
 
   function handleStart() {
     setStep("skills");
@@ -30,23 +34,53 @@ export default function Home() {
     setStep("landing");
     setDirections([]);
     setSelectedDirection(null);
+    setGenerationError(null);
+    setIsGenerating(false);
   }
 
-  function handleGenerateDirections() {
+  function handleSkillsChange(value: string) {
+    setSkills(value);
+
+    if (generationError) {
+      setGenerationError(null);
+    }
+  }
+
+  async function handleGenerateDirections() {
     const normalizedSkills = skills.trim();
 
-    if (!normalizedSkills) {
+    if (!normalizedSkills || isGenerating) {
       return;
     }
 
-    setDirections(buildBusinessDirections(normalizedSkills));
-    setSelectedDirection(null);
-    setStep("opportunities");
+    setIsGenerating(true);
+    setGenerationError(null);
+
+    try {
+      const generatedDirections =
+        await generateBusinessDirections(normalizedSkills);
+
+      setDirections(generatedDirections);
+      setSelectedDirection(null);
+      setStep("opportunities");
+    } catch (error) {
+      console.error(
+        "Failed to generate business directions:",
+        error,
+      );
+
+      setGenerationError(
+        "We couldn't generate your business opportunities. Please try again.",
+      );
+    } finally {
+      setIsGenerating(false);
+    }
   }
 
   function handleEditSkills() {
     setDirections([]);
     setSelectedDirection(null);
+    setGenerationError(null);
     setStep("skills");
   }
 
@@ -78,7 +112,9 @@ export default function Home() {
     return (
       <SkillsForm
         skills={skills}
-        onSkillsChange={setSkills}
+        isGenerating={isGenerating}
+        error={generationError}
+        onSkillsChange={handleSkillsChange}
         onBack={handleReturnToLanding}
         onSubmit={handleGenerateDirections}
       />

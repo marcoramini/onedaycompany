@@ -42,6 +42,23 @@ Dates should be added only when there is a real planning need.
 - [x] Add `PRODUCT_METHOD.md`
 - [x] Add `AI_METHOD.md`
 
+
+### M0.2 — AI-backed Business Opportunities
+
+**Outcome:** Skills are converted into three structured, distinct and testable Business Opportunity hypotheses through a resilient server-side AI workflow.
+
+- [x] Replace the single direction step with three Business Opportunities
+- [x] Introduce typed Business Direction contracts
+- [x] Add asynchronous loading, error and retry states
+- [x] Add `businessOpportunityService` between UI and API
+- [x] Add `POST /api/business-opportunities`
+- [x] Add strict JSON Schema output and Zod validation
+- [x] Integrate the OpenAI Responses API server-side
+- [x] Preserve a deterministic fallback generator
+- [x] Return the generation source as `ai` or `fallback`
+- [x] Support an optional local HTTP proxy bridge for the corporate NTLM network
+- [x] Keep Vercel on direct connectivity by omitting `LOCAL_PROXY_URL`
+
 ## 3. Current milestone
 
 ### M1 — Business Blueprint v1
@@ -82,7 +99,7 @@ Deliverables:
 
 ## 4. Next product milestones
 
-### M2 — Blueprint refinement and first AI integration
+### M2 — Blueprint refinement and AI-assisted generation
 
 **User outcome:** The user receives a more relevant Blueprint generated from their context and can refine it without losing control.
 

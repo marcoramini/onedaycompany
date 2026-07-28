@@ -345,3 +345,43 @@ When information conflicts, use this order:
 A development chat should normally focus on one coherent milestone or technical problem.
 
 At the end of a substantial session, update `CHAT_HANDOFF.md`, `ROADMAP.md` and `CHANGELOG.md` as appropriate. Update other documents when durable product or architecture decisions changed.
+
+---
+
+## DEC-028 — Business Opportunity generation is server-side
+
+**Status:** Accepted
+
+Business Opportunities are generated through a Next.js Route Handler. The browser calls an application service, which calls `POST /api/business-opportunities`.
+
+The UI must not call an AI provider directly and must never receive provider credentials.
+
+---
+
+## DEC-029 — AI generation must fail safely
+
+**Status:** Accepted
+
+Business Opportunity generation uses structured output validated with Zod. If the AI request fails, times out or returns invalid data, the server returns three validated deterministic fallback directions.
+
+The API response records whether the source was `ai` or `fallback`.
+
+---
+
+## DEC-030 — Corporate NTLM proxy is local infrastructure
+
+**Status:** Accepted
+
+The application does not implement NTLM authentication. Local development may route OpenAI requests through a local HTTP bridge such as CNTLM, enabled only by `LOCAL_PROXY_URL`.
+
+When `LOCAL_PROXY_URL` is absent, the OpenAI client connects directly. Vercel Preview and Production must not define this variable. NTLM domain, username, password and bridge configuration must never enter repository code or Vercel environment variables.
+
+---
+
+## DEC-031 — OpenAI integration remains replaceable
+
+**Status:** Accepted
+
+The first provider integration uses the OpenAI Responses API with strict JSON Schema output followed by Zod validation. Provider-specific code remains isolated in the AI Business Opportunity generator.
+
+The public application-service contract remains `generateBusinessDirections(skills)`, and the UI does not depend on the provider, model or prompt.

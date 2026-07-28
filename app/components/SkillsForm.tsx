@@ -1,5 +1,7 @@
 type SkillsFormProps = {
   skills: string;
+  isGenerating: boolean;
+  error: string | null;
   onSkillsChange: (value: string) => void;
   onBack: () => void;
   onSubmit: () => void;
@@ -7,6 +9,8 @@ type SkillsFormProps = {
 
 export default function SkillsForm({
   skills,
+  isGenerating,
+  error,
   onSkillsChange,
   onBack,
   onSubmit,
@@ -14,7 +18,7 @@ export default function SkillsForm({
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    if (!skills.trim()) {
+    if (!skills.trim() || isGenerating) {
       return;
     }
 
@@ -94,17 +98,53 @@ export default function SkillsForm({
               placeholder={`I'm a software developer...\nI love cooking...\nI'm good at teaching...`}
               rows={7}
               autoFocus
-              className="w-full resize-none rounded-3xl border border-violet-200 bg-white px-6 py-5 text-lg leading-8 text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-violet-500 focus:ring-4 focus:ring-violet-100"
+              disabled={isGenerating}
+              className="w-full resize-none rounded-3xl border border-violet-200 bg-white px-6 py-5 text-lg leading-8 text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-violet-500 focus:ring-4 focus:ring-violet-100 disabled:cursor-wait disabled:bg-slate-50 disabled:text-slate-500"
             />
 
             <button
               type="submit"
-              disabled={!skills.trim()}
+              disabled={!skills.trim() || isGenerating}
               className="mt-6 inline-flex w-full items-center justify-center gap-3 rounded-2xl bg-slate-950 px-8 py-4 text-lg font-semibold text-white shadow-lg shadow-violet-200/50 transition hover:-translate-y-0.5 hover:bg-slate-800 focus:outline-none focus:ring-4 focus:ring-violet-200 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:translate-y-0 sm:w-auto sm:min-w-80"
             >
-              Continue
-              <span aria-hidden="true">→</span>
+              {isGenerating ? (
+                <>
+                  <span
+                    aria-hidden="true"
+                    className="h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white"
+                  />
+                  Finding opportunities...
+                </>
+              ) : (
+                <>
+                  Continue
+                  <span aria-hidden="true">→</span>
+                </>
+              )}
             </button>
+
+            {error && (
+              <div
+                role="alert"
+                className="mx-auto mt-5 max-w-xl rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-left"
+              >
+                <p className="font-semibold text-red-900">
+                  Something went wrong
+                </p>
+
+                <p className="mt-1 text-sm leading-6 text-red-700">
+                  {error}
+                </p>
+
+                <button
+                  type="submit"
+                  disabled={isGenerating}
+                  className="mt-3 text-sm font-semibold text-red-800 underline decoration-red-300 underline-offset-4 transition hover:text-red-950"
+                >
+                  Try again
+                </button>
+              </div>
+            )}
 
             <p className="mt-5 text-sm text-slate-400">
               Your information is private and secure.

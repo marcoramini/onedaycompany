@@ -15,7 +15,7 @@ The architecture should evolve incrementally. Avoid building infrastructure befo
 
 ## 2. Current architecture
 
-OneDayCompany is currently a client-side Next.js prototype.
+OneDayCompany is currently a Next.js prototype with a client-side guided workflow and a server-side Business Opportunity generation endpoint.
 
 ### Current stack
 
@@ -44,8 +44,16 @@ Application orchestration
 Domain types
 └── src/app/types/business.ts
 
-Temporary generation logic
-└── src/app/lib/businessGenerator.ts
+Application service
+└── app/lib/businessOpportunityService.ts
+
+Server API
+└── app/api/business-opportunities/route.ts
+
+AI adapter and validation
+├── app/lib/aiBusinessOpportunityGenerator.ts
+├── app/lib/businessOpportunitySchema.ts
+└── app/lib/fallbackBusinessGenerator.ts
 ```
 
 ### Current product flow
@@ -55,12 +63,28 @@ Landing
   ↓
 Skills
   ↓
-Business Direction
+Business Opportunities
   ↓
 The Architect
 ```
 
-The current business-direction generator is deterministic and keyword-based.
+Business Opportunity generation now follows this runtime path:
+
+```text
+Browser UI
+  ↓
+businessOpportunityService
+  ↓
+POST /api/business-opportunities
+  ↓
+OpenAI Responses API + strict structured output
+  ↓
+Zod validation
+  ↓
+three BusinessDirection objects
+```
+
+If the provider call fails or the output is invalid, the route validates and returns the deterministic fallback generator output.
 
 ## 3. Target conceptual architecture
 
@@ -176,6 +200,21 @@ BusinessBlueprint domain object
   ↓
 UI
 ```
+
+
+## 4.1 Environment-specific network path
+
+Corporate local development and Vercel use different network paths without changing application behavior.
+
+```text
+Local corporate development
+Next.js server → LOCAL_PROXY_URL → CNTLM/local bridge → NTLM corporate proxy → OpenAI
+
+Vercel Preview / Production
+Next.js server → direct HTTPS → OpenAI
+```
+
+`LOCAL_PROXY_URL` is optional. Its presence enables the local HTTP proxy agent; its absence selects direct connectivity. The application does not store NTLM domain, username or password.
 
 ## 5. Recommended project structure
 
