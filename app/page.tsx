@@ -4,119 +4,182 @@ import { useState } from "react";
 
 import Architect from "./components/Architect";
 import BusinessOpportunitiesScreen from "./components/BusinessOpportunitiesScreen";
+import CompanyBeginning from "./components/CompanyBeginning";
 import Landing from "./components/Landing";
-import SkillsForm from "./components/SkillsForm";
-import { generateBusinessDirections } from "./lib/businessOpportunityService";
-import type { BusinessDirection } from "./types/business";
+import { generateBusinessOpportunity } from "./lib/businessOpportunitiesService";
+import type { Company } from "./types/business";
 
-type WorkflowStep =
+type Screen =
   | "landing"
-  | "skills"
-  | "opportunities"
+  | "beginning"
+  | "opportunity"
   | "architect";
 
 export default function Home() {
-  const [step, setStep] = useState<WorkflowStep>("landing");
-  const [skills, setSkills] = useState("");
-  const [directions, setDirections] = useState<BusinessDirection[]>([]);
-  const [selectedDirection, setSelectedDirection] =
-    useState<BusinessDirection | null>(null);
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [generationError, setGenerationError] = useState<string | null>(
-    null,
-  );
+  const [currentScreen, setCurrentScreen] =
+    useState<Screen>("landing");
+
+  const [beginningContext, setBeginningContext] =
+    useState("");
+
+  const [company, setCompany] =
+    useState<Company | null>(null);
+
+  const [isGenerating, setIsGenerating] =
+    useState(false);
+
+  const [error, setError] =
+    useState<string | null>(null);
 
   function handleStart() {
-    setStep("skills");
+    setError(null);
+    setCurrentScreen("beginning");
   }
 
-  function handleReturnToLanding() {
-    setStep("landing");
-    setDirections([]);
-    setSelectedDirection(null);
-    setGenerationError(null);
-    setIsGenerating(false);
-  }
+  async function handleGenerateCompany(
+    context: string,
+  ) {
+    const normalizedContext = context.trim();
 
-  function handleSkillsChange(value: string) {
-    setSkills(value);
-
-    if (generationError) {
-      setGenerationError(null);
-    }
-  }
-
-  async function handleGenerateDirections() {
-    const normalizedSkills = skills.trim();
-
-    if (!normalizedSkills || isGenerating) {
+    if (!normalizedContext) {
+      setError(
+        "Share something meaningful to build your company from.",
+      );
       return;
     }
 
+    setBeginningContext(normalizedContext);
     setIsGenerating(true);
-    setGenerationError(null);
+    setError(null);
 
     try {
-      const generatedDirections =
-        await generateBusinessDirections(normalizedSkills);
+      const generatedCompany =
+        await generateBusinessOpportunity(
+          normalizedContext,
+        );
 
-      setDirections(generatedDirections);
-      setSelectedDirection(null);
-      setStep("opportunities");
+      setCompany(generatedCompany);
+      setCurrentScreen("opportunity");
     } catch (error) {
       console.error(
-        "Failed to generate business directions:",
+        "Company generation failed.",
         error,
       );
 
-      setGenerationError(
-        "We couldn't generate your business opportunities. Please try again.",
+      setError(
+        error instanceof Error
+          ? error.message
+          : "We could not shape your company. Please try again.",
       );
     } finally {
       setIsGenerating(false);
     }
   }
 
-  function handleEditSkills() {
-    setDirections([]);
-    setSelectedDirection(null);
-    setGenerationError(null);
-    setStep("skills");
+  async function handleTryDifferentDirection() {
+    if (!company || !beginningContext || isGenerating) {
+      return;
+    }
+
+    setIsGenerating(true);
+    setError(null);
+
+    try {
+      const generatedCompany =
+        await generateBusinessOpportunity(
+          beginningContext,
+          company,
+        );
+
+      setCompany(generatedCompany);
+    } catch (error) {
+      setError(
+        error instanceof Error
+          ? error.message
+          : "We couldn't shape another company.",
+      );
+    } finally {
+      setIsGenerating(false);
+    }
   }
 
-  function handleChooseDirection(direction: BusinessDirection) {
-    setSelectedDirection(direction);
-    setStep("architect");
+  function handleChooseCompany() {
+    if (!company) {
+      return;
+    }
+
+    setError(null);
+    setCurrentScreen("architect");
   }
 
-  function handleReturnToOpportunities() {
-    setSelectedDirection(null);
-    setStep("opportunities");
+  function handleBackToBeginning() {
+    if (isGenerating) {
+      return;
+    }
+
+    setError(null);
+    setCurrentScreen("beginning");
   }
 
-  if (step === "architect" && selectedDirection) {
-    return <Architect onBack={handleReturnToOpportunities} />;
+  function handleBackToCompany() {
+    setError(null);
+    setCurrentScreen("opportunity");
   }
 
-  if (step === "opportunities") {
+  function handleRestart() {
+    setCurrentScreen("landing");
+    setBeginningContext("");
+    setCompany(null);
+    setError(null);
+    setIsGenerating(false);
+  }
+
+  if (currentScreen === "landing") {
+    return <Landing onStart={handleStart} />;
+  }
+
+  if (currentScreen === "beginning") {
     return (
-      <BusinessOpportunitiesScreen
-        directions={directions}
-        onBack={handleEditSkills}
-        onChooseDirection={handleChooseDirection}
+      <CompanyBeginning
+        initialValue={beginningContext}
+        isSubmitting={isGenerating}
+        error={error}
+        onBack={() => {
+          setError(null);
+          setCurrentScreen("landing");
+        }}
+        onSubmit={handleGenerateCompany}
       />
     );
   }
 
-  if (step === "skills") {
+  if (
+    currentScreen === "opportunity" &&
+    company
+  ) {
     return (
-      <SkillsForm
-        skills={skills}
+      <BusinessOpportunitiesScreen
+        company={company}
         isGenerating={isGenerating}
-        error={generationError}
-        onSkillsChange={handleSkillsChange}
-        onBack={handleReturnToLanding}
-        onSubmit={handleGenerateDirections}
+        error={error}
+        onBack={handleBackToBeginning}
+        onChooseCompany={handleChooseCompany}
+        onTryDifferentDirection={
+          handleTryDifferentDirection
+        }
+      />
+    );
+  }
+
+  if (
+    currentScreen === "architect" &&
+    company
+  ) {
+    return (
+      <Architect
+        company={company}
+        onBack={handleBackToCompany}
+        onRestart={handleRestart}
       />
     );
   }

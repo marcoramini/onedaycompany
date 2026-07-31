@@ -1,47 +1,69 @@
 import { NextResponse } from "next/server";
 import { ZodError } from "zod";
 
-import { generateAiBusinessDirections } from "../../lib/aiBusinessOpportunityGenerator";
+import type { Company } from "@/app/types/business";
+
+import { generateAiBusinessOpportunities } from "../../lib/aiBusinessOpportunitiesGenerator";
 import {
-  businessDirectionsSchema,
   businessOpportunitiesRequestSchema,
-} from "../../lib/businessOpportunitySchema";
-import { generateFallbackBusinessDirections } from "../../lib/fallbackBusinessGenerator";
+  companySchema,
+} from "../../lib/businessOpportunitiesSchema";
+import { generateFallbackBusinessOpportunities } from "../../lib/fallbackBusinessGenerator";
 
 export const runtime = "nodejs";
 
-export async function POST(request: Request) {
+type RequestBody = {
+  context?: string;
+  previousCompany?: Company;
+};
+
+export async function POST(
+  request: Request,
+) {
   try {
-    const body: unknown = await request.json();
+    const rawBody =
+      (await request.json()) as RequestBody;
 
-    const { skills } =
-      businessOpportunitiesRequestSchema.parse(body);
-
-    try {
-      const aiDirections =
-        await generateAiBusinessDirections(skills);
-
-      const validatedDirections =
-        businessDirectionsSchema.parse(aiDirections);
-
-      return NextResponse.json({
-        directions: validatedDirections,
-        source: "ai",
-      });
-    } catch (aiError) {
-      console.error(
-        "AI business opportunity generation failed. Using fallback:",
-        aiError,
+    const { context } =
+      businessOpportunitiesRequestSchema.parse(
+        rawBody,
       );
 
-      const fallbackDirections =
-        generateFallbackBusinessDirections(skills);
+    const previousCompany =
+      rawBody.previousCompany
+        ? companySchema.parse(
+            rawBody.previousCompany,
+          )
+        : undefined;
 
-      const validatedFallbackDirections =
-        businessDirectionsSchema.parse(fallbackDirections);
+    try {
+      const company =
+        await generateAiBusinessOpportunities(
+          context,
+          previousCompany,
+        );
+
+      console.log("Company generated with AI:", company.name);
+      
+      return NextResponse.json({
+        company: companySchema.parse(company),
+        source: "ai",
+      });
+    } catch (error) {
+      console.error(
+        "AI company generation failed. Using fallback.",
+        error,
+      );
+
+      const company =
+        generateFallbackBusinessOpportunities(
+          context,
+        );
+
+      console.warn("Returning fallback company:", company.name);
 
       return NextResponse.json({
-        directions: validatedFallbackDirections,
+        company: companySchema.parse(company),
         source: "fallback",
       });
     }
@@ -49,23 +71,29 @@ export async function POST(request: Request) {
     if (error instanceof ZodError) {
       return NextResponse.json(
         {
-          error: "Invalid business opportunities request.",
-          details: error.issues,
+          error:
+            "Please share something meaningful to build your company from.",
+          details: error.flatten(),
         },
-        { status: 400 },
+        {
+          status: 400,
+        },
       );
     }
 
     console.error(
-      "Failed to generate business opportunities:",
+      "Business opportunities route failed.",
       error,
     );
 
     return NextResponse.json(
       {
-        error: "Unable to generate business opportunities.",
+        error:
+          "We could not shape your company. Please try again.",
       },
-      { status: 500 },
+      {
+        status: 500,
+      },
     );
   }
 }

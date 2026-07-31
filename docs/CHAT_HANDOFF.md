@@ -2,29 +2,70 @@
 
 ## 1. Current product direction
 
-OneDayCompany transforms skills into businesses.
+OneDayCompany helps people turn what they already have into a business they are proud to build.
 
-It is an AI-assisted Entrepreneur Operating System that guides a user from existing skills to a validated business, first offer, first customer and first revenue. The workflow and Product Method are the core product assets; AI is a structured enabling layer, not a generic chatbot.
+The product is for people who may not consider themselves entrepreneurs, may not have a clear business idea and may underestimate their skills. It should help them begin today from interests, passions, experience, knowledge, curiosity or imagination.
 
-Public product content and UI copy are written in English. Collaboration with Marco is conducted in Italian.
+OneDayCompany never evaluates the user. Every interaction reinforces that the user already has enough to begin and that their company is already taking shape.
 
-## 2. Current implemented flow
+Public UI and product copy are in English. Collaboration with Marco is in Italian.
+
+## 2. Product principles established in the latest session
+
+- The company begins today, not in a distant imagined future.
+- Tomorrow is for continued improvement, one practical step at a time.
+- The product must guide rather than interview.
+- Initial prompts must not assume entrepreneurial knowledge.
+- Avoid asking for a first customer, target market or similar founder concepts at the beginning.
+- Everything the user already has can count.
+- The interaction should help the user recognize value in themselves and what they love doing.
+- Generate one Business Opportunity at a time.
+- The user can build it, refine it or request another direction.
+- Previously generated opportunities remain available for later selection.
+
+## 3. Landing decision
+
+The accepted central message is:
+
+> Love what you build. Build what you love. Start today.
+
+Primary CTA:
+
+> Start my company
+
+Supporting concepts:
+
+> You already have something worth building.
+
+> You don't need a business idea. You only need to begin.
+
+A replacement `Landing.tsx` was proposed with:
+
+- minimal header;
+- large three-line hero;
+- violet emphasis on `Start today.`;
+- dark primary CTA;
+- three lower sections: `Begin as you are`, `Build today`, `Grow every day`.
+
+Repository code remains the first source of truth. Confirm whether this proposed component has been pasted into the repository, then run `npm run build` before committing or deploying.
+
+## 4. Current repository flow before the next milestone
 
 ```text
 Landing
   ↓
-Skills
+Skills form
   ↓
-Business Opportunities
+Three Business Opportunities
   ↓
 The Architect
 ```
 
-The user enters skills and receives exactly three distinct Business Opportunity hypotheses. The user selects one before entering The Architect.
+This current flow is technically functional but no longer matches the intended product direction.
 
-## 3. Completed milestone — AI-backed Business Opportunities
+## 5. Existing technical foundation to preserve
 
-Implemented architecture:
+The Business Opportunity pipeline currently includes:
 
 ```text
 UI
@@ -39,109 +80,97 @@ strict JSON Schema
   ↓
 Zod validation
   ↓
-three BusinessDirection objects
+typed BusinessDirection output
 ```
 
-Resilience path:
+Resilience includes a deterministic fallback generator and an API source indicator (`ai` or `fallback`).
+
+Prompts are separated from implementation, currently using a module such as:
 
 ```text
-AI timeout / provider error / invalid output
-  ↓
-deterministic fallback generator
-  ↓
-validated directions
-  ↓
-HTTP 200 with source: fallback
+app/lib/prompts/businessOpportunityPrompt.ts
 ```
 
-The API response identifies the source as `ai` or `fallback`. The UI is independent from the provider, model and prompt.
+The existing output contract generates exactly three opportunities. The next milestone will intentionally change this to one opportunity at a time.
 
-## 4. Local corporate proxy
+## 6. Current opportunity model
 
-The corporate network uses an NTLM-authenticated proxy. The application does not implement NTLM.
-
-Local development uses an optional local bridge such as CNTLM:
+The opportunity structure has been migrated to:
 
 ```text
-Next.js → LOCAL_PROXY_URL → CNTLM → corporate NTLM proxy → OpenAI
+id
+name
+motto
+vision
+overview
+skillAffinity
+distinctiveness
+initialCapital
+additionalSkills
 ```
 
-`.env.local` may contain:
+The prompt was improved to produce differentiated, branded and customer-facing businesses rather than three versions of generic consulting.
 
-```env
-OPENAI_API_KEY=...
-OPENAI_BUSINESS_MODEL=...
-LOCAL_PROXY_URL=http://127.0.0.1:3128
-```
+Do not continue optimizing the old three-card prompt before redesigning the onboarding and one-opportunity flow.
 
-Vercel must contain only the OpenAI variables. Do not configure `LOCAL_PROXY_URL` on Vercel; the server then connects directly. Never commit `.env.local`, proxy credentials or CNTLM configuration.
+## 7. Next coherent milestone
 
-## 5. Main files affected by the completed milestone
+### Guided Company Beginning v1
 
-Paths should be confirmed against the repository, which remains the first source of truth.
+Replace `SkillsForm` with a short guided interaction that:
+
+- starts from what the user loves, knows, imagines or wants to create;
+- does not feel like an interview or assessment;
+- avoids narrow or entrepreneurial questions;
+- provides encouragement and visible progress;
+- gathers enough context to generate one company proposal;
+- reinforces that the company is already being built.
+
+Then adapt generation to return one opportunity and support:
+
+- `Let's build this`
+- `Refine this idea`
+- `Try a different direction`
+- saved previous opportunities
+
+Work in small steps. The first step in the next chat should be product/UX design of the replacement for `SkillsForm`, followed by identification of affected files. Do not implement the entire opportunity history architecture in the first change unless it is required by the chosen smallest milestone.
+
+## 8. Likely affected files
+
+Confirm paths against the repository before changes:
 
 ```text
 app/page.tsx
 app/components/SkillsForm.tsx
 app/components/BusinessOpportunitiesScreen.tsx
+app/components/OpportunityCard.tsx
 app/lib/businessOpportunityService.ts
 app/lib/businessOpportunitySchema.ts
 app/lib/aiBusinessOpportunityGenerator.ts
 app/lib/fallbackBusinessGenerator.ts
+app/lib/prompts/businessOpportunityPrompt.ts
 app/api/business-opportunities/route.ts
 app/types/business.ts
-package.json
 ```
 
-## 6. Current technical behavior
+New components and types may be preferable rather than forcing the new concept into `SkillsForm`.
 
-- OpenAI is called only from the server.
-- Structured output must contain exactly three opportunities.
-- Zod validates provider and fallback output before it reaches UI state.
-- Skills remain available after recoverable errors.
-- The user can retry generation.
-- The deterministic fallback preserves the workflow during provider outages.
-- Local proxy support is activated only by `LOCAL_PROXY_URL`.
-- Vercel uses direct network access.
+## 9. Technical environment
 
-## 7. Verification required before push
+Local corporate network may require an optional local bridge such as CNTLM:
 
-Run locally from the real repository:
-
-```bash
-npm run build
+```text
+Next.js → LOCAL_PROXY_URL → local bridge → corporate NTLM proxy → OpenAI
 ```
 
-Then verify:
+Never commit `.env.local`, secrets, proxy credentials or bridge configuration. Do not configure `LOCAL_PROXY_URL` on Vercel.
 
-1. AI path returns `source: "ai"`.
-2. A forced provider failure returns `source: "fallback"`.
-3. No secret or `.env.local` appears in `git status`.
-4. `LOCAL_PROXY_URL` is not configured in Vercel.
+## 10. Working rules
 
-## 8. Next milestone
-
-### M1 — Business Blueprint v1
-
-**User outcome:** turn the selected Business Opportunity into a concise, inspectable and actionable business hypothesis.
-
-Recommended sequence:
-
-1. Define `BusinessBlueprint` and supporting domain types.
-2. Define which fields are user-derived, generated assumptions or later evidence.
-3. Create a deterministic Blueprint contract before expanding AI behavior.
-4. Introduce an explicit typed workflow state.
-5. Build the Business Blueprint screen.
-6. Connect The Architect to the Blueprint.
-7. End with one clear validation action.
-8. Add backward navigation and responsive checks.
-9. Run build, review diff, deploy and update documentation.
-
-## 9. Working rules
-
-- Work on one coherent milestone per chat.
-- Prefer small, verifiable changes.
+- One coherent milestone per chat.
+- Small, verifiable changes.
+- Discuss alternatives before significant architecture changes.
 - Clearly identify affected files.
 - Do not silently revise accepted decisions.
-- Require `npm run build` before every push.
-- Update `CHAT_HANDOFF.md`, `ROADMAP.md` and `CHANGELOG.md` at the end of substantial sessions.
+- Run `npm run build` before every push.
+- Update `CHAT_HANDOFF.md`, `ROADMAP.md` and `CHANGELOG.md` after substantial work.

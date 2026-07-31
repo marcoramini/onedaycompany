@@ -1,8 +1,6 @@
 # OneDayCompany — Product and Architecture Decisions
 
-This document records durable decisions.
-
-Do not use it as a daily diary. Add or revise a decision only when it should guide future product or technical work.
+This document records durable decisions. It is not a daily diary.
 
 ---
 
@@ -10,21 +8,19 @@ Do not use it as a daily diary. Add or revise a decision only when it should gui
 
 **Status:** Accepted
 
-All public product content, UI labels, prompts shown to users and user-facing output are written in English.
-
-Development discussions with Marco are conducted in Italian.
-
-**Reason:** The product is intended for an international audience, while collaboration is more efficient in Italian.
+All public product content, UI labels, user-facing prompts and generated product copy are written in English. Development discussions with Marco are conducted in Italian.
 
 ---
 
 ## DEC-002 — Canonical mission
 
-**Status:** Accepted
+**Status:** Revised and accepted
 
 The canonical mission is:
 
-> OneDayCompany transforms skills into businesses.
+> OneDayCompany helps people turn what they already have into a business they are proud to build.
+
+The earlier formulation, “transforms skills into businesses,” is now too narrow because the product may begin from interests, passions, experience, knowledge, imagination or aspirations—not only explicit skills.
 
 ---
 
@@ -32,356 +28,217 @@ The canonical mission is:
 
 **Status:** Accepted
 
-OneDayCompany is an **Entrepreneur Operating System**.
+OneDayCompany is an **AI-assisted Entrepreneur Operating System**.
 
-It is a guided environment that moves a user from existing skills to a validated business, first offer, first customer and first revenue.
-
-It must not be positioned or designed as a generic chatbot or static business-plan generator.
+It must not be positioned or designed as a generic chatbot, founder assessment or static business-plan generator.
 
 ---
 
-## DEC-004 — Start from skills, not business ideas
+## DEC-004 — Begin from the whole person, not only skills
+
+**Status:** Revised and accepted
+
+The product must not require the user to identify important skills or arrive with a business idea.
+
+The beginning may uncover:
+
+- interests;
+- passions;
+- experience;
+- knowledge;
+- curiosity;
+- imagination;
+- things the user enjoys doing;
+- things the user would be proud to build.
+
+Everything the user already has can count.
+
+---
+
+## DEC-005 — OneDayCompany never evaluates the user
 
 **Status:** Accepted
 
-The onboarding starts by asking users what they are good at, what they know or what they have done.
+OneDayCompany never asks questions to determine whether the user is capable, qualified or entrepreneurial enough.
 
-The product should not require the user to arrive with a business idea.
-
-**Reason:** Many potential users have valuable capabilities but lack a clear business direction. The product must reduce this initial ambiguity.
+Every interaction must reinforce that the user already has enough to begin. The purpose of each step is to uncover the foundations of a company that is already starting to take shape.
 
 ---
 
-## DEC-005 — Workflow is the primary product asset
+## DEC-006 — Guide, do not interview
 
 **Status:** Accepted
 
-The product’s defensibility should come from the Product Method, workflow, decision logic, structured context, validation system and user experience—not dependence on a specific LLM.
+The initial interaction may use a conversational interface, but it must not feel like an interview, questionnaire or generic chat.
 
-**Implication:** Product stages and domain contracts must be defined independently from provider behavior.
+Prompts should be framed as encouraging steps in starting the company. Avoid language that assumes entrepreneurial expertise, such as asking for the first customer, target market or validated problem before the user is ready.
 
 ---
 
-## DEC-006 — One screen, one objective
+## DEC-007 — The company begins today
+
+**Status:** Accepted
+
+OneDayCompany presents the business as already coming to life from the first interaction.
+
+The product should not sell a distant future or ask the user to imagine where they will be in one year. Today is the moment of change; tomorrow the user continues improving the business one practical step at a time.
+
+---
+
+## DEC-008 — Current landing message
+
+**Status:** Accepted
+
+The current central landing message is:
+
+> Love what you build. Build what you love. Start today.
+
+Supporting copy should communicate that the user already has something worth building and does not need a perfect business idea to begin.
+
+The primary CTA is:
+
+> Start my company
+
+---
+
+## DEC-009 — One Business Opportunity at a time
+
+**Status:** Accepted
+
+The intended experience generates one Business Opportunity at a time.
+
+After receiving it, the user should be able to:
+
+- continue building it;
+- refine it;
+- request a different direction.
+
+Previous opportunities remain available for later selection.
+
+This replaces the long-term product direction of presenting exactly three opportunities simultaneously.
+
+---
+
+## DEC-010 — Workflow is the primary product asset
+
+**Status:** Accepted
+
+The durable value comes from the Product Method, workflow, decision logic, structured state, validation system and user experience—not dependence on one model.
+
+---
+
+## DEC-011 — One screen, one objective
 
 **Status:** Accepted
 
 Each screen should have one primary objective, one central user decision or one clear output.
 
-**Reason:** Entrepreneurship is cognitively demanding. The interface must reduce simultaneous choices rather than multiply them.
+---
+
+## DEC-012 — Build visibly while validating
+
+**Status:** Revised and accepted
+
+Validation remains essential, but it should occur through real-world action while the business takes shape.
+
+Do not delay visible creation through long preliminary research phases. Prefer a simple launchable foundation, customer contact and evidence over unnecessary building or speculative planning.
 
 ---
 
-## DEC-007 — Validation before unnecessary building
+## DEC-013 — Every stage produces a business asset or action
 
 **Status:** Accepted
 
-The workflow should move users toward customer evidence before recommending substantial work on websites, software, branding, automation or operations.
-
-**Reason:** Early validation reduces wasted effort and improves the probability of building something people want.
+Each meaningful stage must produce at least one decision, structured hypothesis, visible business asset, validation action, customer action or measurable next step.
 
 ---
 
-## DEC-008 — Every stage produces a business asset or action
+## DEC-014 — AI is an enabling layer, not the public identity
 
 **Status:** Accepted
 
-Every meaningful stage must produce at least one of:
-
-- a decision;
-- a structured hypothesis;
-- a business asset;
-- a validation experiment;
-- market evidence;
-- a customer action;
-- a measurable next step.
-
-Long generated reports without a decision or action are not sufficient product outcomes.
+Public communication focuses on the user, their company and concrete progress. AI remains behind the experience.
 
 ---
 
-## DEC-009 — AI is an enabling layer, not the public product identity
+## DEC-015 — AI recommends; the user decides
 
 **Status:** Accepted
 
-AI should accelerate analysis, synthesis and creation inside the Product Method.
-
-Public communication should focus primarily on the user outcome and the clarity of the process, not on AI technology.
-
-**Reason:** Models will change and become more widely available. The durable value is the entrepreneurial system.
+AI may generate and refine opportunities, but the user explicitly decides what to continue building. Generated assumptions must not be presented as validated facts.
 
 ---
 
-## DEC-010 — AI recommends; the user decides
+## DEC-016 — Low-cost, simple and launchable opportunities
 
 **Status:** Accepted
 
-AI may generate alternatives, recommendations and deliverables, but core business decisions remain explicit user decisions.
+Business proposals should be realistic for one person, begin with very low or almost no initial investment and avoid unnecessary operational complexity.
 
-Generated assumptions must not be presented as validated facts.
-
----
-
-## DEC-011 — Current public promise
-
-**Status:** Accepted for the current landing direction
-
-The current public promise is:
-
-> Launch your next business in a few clear steps today.
-
-The landing should create the feeling that clicking the primary call to action begins the business-building process immediately.
-
-**Interpretation:** “Today” means the user can begin taking meaningful action now; it is not a guarantee that a complete successful company will be created in one day.
+They should feel like recognizable companies, not merely obvious freelance services.
 
 ---
 
-## DEC-012 — Public copy should inspire action, not explain the technology
+## DEC-017 — Structured AI output
 
 **Status:** Accepted
 
-The landing and acquisition copy should communicate:
-
-- possibility;
-- immediacy;
-- clarity;
-- progress from skills to business.
-
-Avoid making AI the hero of the public narrative.
+Core AI-generated application data must use structured contracts and validation before reaching UI state.
 
 ---
 
-## DEC-013 — The Business Blueprint is a living hypothesis
+## DEC-018 — Prompt modules remain separate
 
 **Status:** Accepted
 
-The Business Blueprint is not a traditional or final business plan.
+Prompts are stored as typed TypeScript modules outside implementation files, with one file per product capability where practical.
 
-It is a structured set of current assumptions about:
+Example:
 
-- customer;
-- problem;
-- value proposition;
-- offer;
-- delivery;
-- pricing;
-- acquisition;
-- validation;
-- next action.
-
-It should evolve when evidence is collected.
+```text
+app/lib/prompts/businessOpportunityPrompt.ts
+```
 
 ---
 
-## DEC-014 — The Architect is a transition stage
+## DEC-019 — Provider independence with proportionate abstraction
 
 **Status:** Accepted
 
-The Architect represents the reasoning and generation phase between a selected Business Direction and the Business Blueprint.
-
-It should not repeat the Business Direction content.
-
-When real generation is introduced, it should reflect useful progress and recoverable processing—not an arbitrary artificial delay.
+Domain models, workflow and UI must not depend directly on one AI provider. Provider-specific code should remain isolated without creating unnecessary abstraction.
 
 ---
 
-## DEC-015 — Define workflow and data contracts before AI integration
+## DEC-020 — Current frontend stack
 
 **Status:** Accepted
 
-The Business Blueprint schema, stage objective and UX should be validated using deterministic or mocked data before real AI integration.
-
-**Reason:** The product contract should define model behavior, not the reverse.
+Use Next.js, React, TypeScript, Tailwind CSS, App Router and Vercel.
 
 ---
 
-## DEC-016 — Structured AI output
+## DEC-021 — Component separation
 
 **Status:** Accepted
 
-AI-generated application data must use a structured contract and be validated before reaching UI state.
-
-Raw provider prose must not become the only representation of core domain state.
+Screen-level UI and reusable components remain separate from `page.tsx`. Workflow coordination must not absorb large UI sections or generation rules.
 
 ---
 
-## DEC-017 — Provider independence with proportionate abstraction
+## DEC-022 — Explicit typed workflow state
 
 **Status:** Accepted
 
-Domain models, workflow and UI must not depend on one AI provider.
-
-Provider-specific code should be isolated behind a minimal adapter.
-
-Do not create a large multi-provider abstraction before a concrete need exists.
+As the onboarding evolves into conversation, opportunity history, refinement and selection, navigation should use explicit typed workflow state rather than independent booleans.
 
 ---
 
-## DEC-018 — Current frontend stack
+## DEC-023 — Build verification before push
 
 **Status:** Accepted
 
-Use:
-
-- Next.js;
-- React;
-- TypeScript;
-- Tailwind CSS;
-- App Router;
-- Vercel.
-
----
-
-## DEC-019 — Component separation
-
-**Status:** Accepted
-
-Screen-level UI and reusable UI elements must remain separate from `page.tsx`.
-
-`page.tsx` or its successor should coordinate workflow state and navigation rather than contain large UI sections or business-generation rules.
-
----
-
-## DEC-020 — Explicit typed workflow state
-
-**Status:** Accepted
-
-Independent boolean navigation state is temporary.
-
-Before the workflow grows beyond the current stages, navigation should move to an explicit typed workflow state, preferably a discriminated union when stage context becomes richer.
-
----
-
-## DEC-021 — Temporary deterministic generator
-
-**Status:** Accepted, temporary
-
-The current Business Direction is generated through keyword-based TypeScript logic.
-
-**Reason:** It allows workflow and UX testing without API cost or backend complexity.
-
-**Replacement condition:** Replace or complement it when the relevant domain contract, stage UX and evaluation criteria are defined.
-
----
-
-## DEC-022 — Persistence is introduced by product need
-
-**Status:** Accepted
-
-No database is required for the current prototype.
-
-Persistence should be introduced when users need to resume workflows, manage multiple businesses, retain Blueprints and edits, accumulate validation evidence, authenticate or use paid features.
-
----
-
-## DEC-023 — Deploy early and verify production
-
-**Status:** Accepted
-
-The prototype is deployed before full functionality.
-
-Production preview:
-
-https://onedaycompany.vercel.app/
-
-Every meaningful release should be verified in the production deployment.
-
----
-
-## DEC-024 — Build before push
-
-**Status:** Accepted
-
-Before every push:
+Before every push, run:
 
 ```bash
 npm run build
 ```
-
-When available, also run linting and tests.
-
----
-
-## DEC-025 — Documentation is project memory
-
-**Status:** Accepted
-
-Chat history must not be the only project memory.
-
-Repository documentation is authoritative for:
-
-- vision;
-- Product Method;
-- AI Method;
-- architecture;
-- durable decisions;
-- roadmap;
-- current session handoff.
-
----
-
-## DEC-026 — Source of truth hierarchy
-
-**Status:** Accepted
-
-When information conflicts, use this order:
-
-1. current repository code;
-2. `DECISIONS.md`;
-3. `PROJECT_BRIEF.md`;
-4. `PRODUCT_METHOD.md`;
-5. `VISION.md`;
-6. `ARCHITECTURE.md`;
-7. `ROADMAP.md`;
-8. `CHAT_HANDOFF.md`;
-9. previous chat context.
-
----
-
-## DEC-027 — One coherent milestone per chat
-
-**Status:** Accepted
-
-A development chat should normally focus on one coherent milestone or technical problem.
-
-At the end of a substantial session, update `CHAT_HANDOFF.md`, `ROADMAP.md` and `CHANGELOG.md` as appropriate. Update other documents when durable product or architecture decisions changed.
-
----
-
-## DEC-028 — Business Opportunity generation is server-side
-
-**Status:** Accepted
-
-Business Opportunities are generated through a Next.js Route Handler. The browser calls an application service, which calls `POST /api/business-opportunities`.
-
-The UI must not call an AI provider directly and must never receive provider credentials.
-
----
-
-## DEC-029 — AI generation must fail safely
-
-**Status:** Accepted
-
-Business Opportunity generation uses structured output validated with Zod. If the AI request fails, times out or returns invalid data, the server returns three validated deterministic fallback directions.
-
-The API response records whether the source was `ai` or `fallback`.
-
----
-
-## DEC-030 — Corporate NTLM proxy is local infrastructure
-
-**Status:** Accepted
-
-The application does not implement NTLM authentication. Local development may route OpenAI requests through a local HTTP bridge such as CNTLM, enabled only by `LOCAL_PROXY_URL`.
-
-When `LOCAL_PROXY_URL` is absent, the OpenAI client connects directly. Vercel Preview and Production must not define this variable. NTLM domain, username, password and bridge configuration must never enter repository code or Vercel environment variables.
-
----
-
-## DEC-031 — OpenAI integration remains replaceable
-
-**Status:** Accepted
-
-The first provider integration uses the OpenAI Responses API with strict JSON Schema output followed by Zod validation. Provider-specific code remains isolated in the AI Business Opportunity generator.
-
-The public application-service contract remains `generateBusinessDirections(skills)`, and the UI does not depend on the provider, model or prompt.

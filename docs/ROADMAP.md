@@ -2,251 +2,164 @@
 
 ## 1. Roadmap principle
 
-The roadmap is outcome-based.
+Milestones represent a meaningful increase in the probability that a person starts a real business today or makes that business more likely to succeed tomorrow.
 
-Milestones should represent a meaningful increase in the user’s probability of starting a real business—not only the addition of technical features.
-
-Dates should be added only when there is a real planning need.
+Prefer visible outputs, low initial cost and real-world customer action over planning depth or feature volume.
 
 ## 2. Completed
 
 ### M0 — Foundation
 
-**Outcome:** OneDayCompany exists as a live, navigable product prototype with a clear mission and initial workflow.
+**Outcome:** A live Next.js prototype with the first navigable workflow.
 
-- [x] Define mission and initial vision
-- [x] Choose product name
-- [x] Create Next.js project
-- [x] Build initial landing page
-- [x] Build skills input
-- [x] Build deterministic Business Direction generation
-- [x] Build Business Direction screen
-- [x] Add The Architect transition screen
-- [x] Separate major UI components from `page.tsx`
+- [x] Create application foundation
+- [x] Build initial landing, skills form and business direction flow
+- [x] Add The Architect transition
 - [x] Deploy on Vercel
-- [x] Establish Git-based deployment workflow
-- [x] Establish initial project documentation
+- [x] Establish Git and documentation workflow
 
-### M0.1 — Product Vision alignment
+### M0.1 — Product and AI method alignment
 
-**Outcome:** The product is positioned as an Entrepreneur Operating System whose method and workflow are more important than a specific AI model.
+**Outcome:** OneDayCompany is established as an AI-assisted Entrepreneur Operating System whose workflow is more important than any model.
 
-- [x] Confirm mission: “OneDayCompany transforms skills into businesses.”
-- [x] Define the public promise around launching through clear steps
-- [x] Remove AI from the center of public communication
-- [x] Confirm “one screen, one objective”
-- [x] Confirm validation before unnecessary building
-- [x] Define Product Method as a core asset
-- [x] Define AI as an enabling layer
-- [x] Rewrite the core project documentation
-- [x] Add `PRODUCT_METHOD.md`
-- [x] Add `AI_METHOD.md`
-
+- [x] Confirm one screen, one objective
+- [x] Keep AI out of the center of public communication
+- [x] Define structured AI contracts and validation
+- [x] Add Product Method and AI Method documentation
 
 ### M0.2 — AI-backed Business Opportunities
 
-**Outcome:** Skills are converted into three structured, distinct and testable Business Opportunity hypotheses through a resilient server-side AI workflow.
+**Outcome:** The existing Skills flow generates structured opportunities through a resilient server-side AI pipeline.
 
-- [x] Replace the single direction step with three Business Opportunities
-- [x] Introduce typed Business Direction contracts
-- [x] Add asynchronous loading, error and retry states
-- [x] Add `businessOpportunityService` between UI and API
-- [x] Add `POST /api/business-opportunities`
-- [x] Add strict JSON Schema output and Zod validation
-- [x] Integrate the OpenAI Responses API server-side
-- [x] Preserve a deterministic fallback generator
-- [x] Return the generation source as `ai` or `fallback`
-- [x] Support an optional local HTTP proxy bridge for the corporate NTLM network
-- [x] Keep Vercel on direct connectivity by omitting `LOCAL_PROXY_URL`
+- [x] Add OpenAI Responses API integration
+- [x] Add strict JSON Schema and Zod validation
+- [x] Add deterministic fallback generation
+- [x] Add loading, retry and recoverable error behavior
+- [x] Add optional local proxy support
+- [x] Separate prompt content into a prompt module
+- [x] Improve opportunity branding, diversity and customer-facing copy
+
+### M0.3 — Landing vision reset
+
+**Outcome:** The landing now communicates immediate personal and entrepreneurial action rather than a skills-analysis workflow.
+
+- [x] Establish the central message: “Love what you build. Build what you love. Start today.”
+- [x] Use “Start my company” as the primary CTA
+- [x] Remove the old skills-first timeline from the proposed landing
+- [x] Communicate that the user does not need a perfect business idea
+- [ ] Verify final implementation visually in the repository
+- [ ] Run `npm run build`
+- [ ] Commit and deploy the landing change
 
 ## 3. Current milestone
 
-### M1 — Business Blueprint v1
+### M1 — Guided Company Beginning v1
 
-**User outcome:** The user turns a selected Business Direction into a clear, inspectable and actionable business hypothesis.
+**User outcome:** A person who may have no clear idea and may underestimate their skills begins creating a company through a short, encouraging interaction.
 
-The Blueprint should include:
+The interaction must feel like building—not interviewing.
 
-- target customer;
-- customer problem;
-- value proposition;
-- first offer;
-- delivery model;
-- pricing hypothesis;
-- acquisition starting point;
-- core assumptions;
-- validation experiment;
-- first concrete action.
+#### Product work
 
-Deliverables:
+- [ ] Replace the current Skills form
+- [ ] Define the emotional progression of the first interaction
+- [ ] Define a small number of broad, supportive prompts
+- [ ] Allow the user to express interests, passions, experience, knowledge or imagination
+- [ ] Avoid founder-language such as target customer, market or problem during the first step
+- [ ] Reinforce that everything the user already has can count
+- [ ] Keep one screen and one objective
 
-- [ ] Define `BusinessBlueprint` domain type
-- [ ] Define which fields are hypotheses and which come from user input
-- [ ] Create deterministic or mocked Blueprint generator
-- [ ] Create Business Blueprint screen
-- [ ] Connect The Architect to the Blueprint
-- [ ] Introduce explicit typed workflow state
-- [ ] Preserve selected skills and Business Direction in workflow state
-- [ ] Add backward navigation
-- [ ] Ensure each Blueprint section is concise and actionable
-- [ ] End the Blueprint with one clear validation action
-- [ ] Check responsive layout
+#### Opportunity flow
+
+- [ ] Generate exactly one Business Opportunity at a time
+- [ ] Add `Let's build this`
+- [ ] Add `Refine this idea`
+- [ ] Add `Try a different direction`
+- [ ] Keep previous opportunities in a saved list
+- [ ] Allow later selection from saved opportunities
+- [ ] Prevent repeated near-duplicate directions
+
+#### Architecture
+
+- [ ] Define typed onboarding/conversation state
+- [ ] Define the context object sent to opportunity generation
+- [ ] Update the Business Opportunity response contract from three items to one item
+- [ ] Preserve structured validation and fallback behavior
+- [ ] Decide how refinement instructions modify generation context
+- [ ] Add explicit typed workflow state
+- [ ] Verify backward navigation and responsive behavior
+
+#### Completion
+
+- [ ] Test with users who provide vague inputs
+- [ ] Test with users who already have a specific idea
 - [ ] Run `npm run build`
-- [ ] Deploy successfully
+- [ ] Review diff
+- [ ] Commit and deploy
 - [ ] Update documentation and handoff
 
-**Completion evidence:** A user can begin with skills and reach a coherent Blueprint that is ready to test.
+## 4. Next milestones
 
-## 4. Next product milestones
+### M2 — Company commitment and opportunity workspace
 
-### M2 — Blueprint refinement and AI-assisted generation
+**User outcome:** The user chooses a company to build while preserving alternative directions.
 
-**User outcome:** The user receives a more relevant Blueprint generated from their context and can refine it without losing control.
+- [ ] Create saved Opportunities workspace
+- [ ] Make the selected company the active project
+- [ ] Show why the company fits without evaluating the user
+- [ ] Preserve original user context and refinements
+- [ ] Support returning to an alternative opportunity
 
-- [ ] Define stage-specific prompt and evaluation examples
-- [ ] Add server-side generation route or Server Action
-- [ ] Add provider adapter
-- [ ] Request structured output
-- [ ] Validate response against domain schema
-- [ ] Preserve user edits across regeneration
-- [ ] Add loading, error and retry states
-- [ ] Record prompt version, model, latency and approximate cost
-- [ ] Test output quality with representative Skill Profiles
-- [ ] Keep deterministic fallback during early testing if useful
+### M3 — First launchable company foundation
 
-### M3 — Customer and Problem focus
+**User outcome:** The chosen company becomes visible and ready for initial contact with the market.
 
-**User outcome:** The user converts a broad Blueprint into a specific customer-problem hypothesis that can be researched.
+- [ ] Initial identity and positioning
+- [ ] Simple first offer
+- [ ] Lightweight customer-facing landing page
+- [ ] Contact or conversion mechanism
+- [ ] First customer action
+- [ ] Clear assumptions to test through launch
 
-- [ ] Define initial customer segment
-- [ ] Define problem hypothesis
-- [ ] Define current alternatives
-- [ ] Identify main assumptions
-- [ ] Identify real people or sources to investigate
-- [ ] Create a focused research objective
-- [ ] Prevent advancement when the hypothesis is too broad to test
+### M4 — First customer workflow
 
-### M4 — First Offer
+**User outcome:** The user reaches out, learns from real people and moves toward the first commitment.
 
-**User outcome:** The user creates the smallest credible offer that can be presented to a potential customer.
+- [ ] Prospect and outreach workflow
+- [ ] Customer conversation support
+- [ ] Evidence capture
+- [ ] Offer refinement
+- [ ] Follow-up and first commitment
 
-- [ ] Define promised outcome
-- [ ] Define scope and exclusions
-- [ ] Define deliverables
-- [ ] Define delivery model
-- [ ] Define timeline
-- [ ] Define pricing or commitment hypothesis
-- [ ] Generate concise offer description
-- [ ] Create a customer-facing version
+### M5 — First revenue and daily improvement
 
-### M5 — Validation Engine
+**User outcome:** The user delivers, gets paid and improves the business one day at a time.
 
-**User outcome:** The user launches a real validation action and records evidence.
+- [ ] Delivery checklist
+- [ ] Payment recording
+- [ ] Feedback and testimonial capture
+- [ ] Daily next action
+- [ ] Offer, positioning and process improvement
 
-- [ ] Convert assumptions into testable questions
-- [ ] Generate interview guide
-- [ ] Generate outreach message
-- [ ] Define positive, negative and inconclusive evidence
-- [ ] Track customer conversations
-- [ ] Record quotes, behavior and commitments
-- [ ] Separate evidence from interpretation
-- [ ] Recommend continue, refine or change
-- [ ] Require a concrete next validation action
+## 5. Enabling platform work
 
-### M6 — First Customer workflow
+Introduce only when it supports the current business-building outcome:
 
-**User outcome:** The user moves from validated interest to a real customer commitment.
+- authentication and persistence;
+- multiple company projects;
+- analytics aligned with meaningful user action;
+- billing and usage limits;
+- privacy, terms and deletion;
+- production monitoring and support.
 
-- [ ] Create simple prospect workflow
-- [ ] Track outreach and replies
-- [ ] Prepare discovery conversation
-- [ ] Generate proposal or trial invitation
-- [ ] Support objections and follow-up
-- [ ] Record commitments
-- [ ] Record first customer
+## 6. Explicitly deferred
 
-### M7 — First Revenue
-
-**User outcome:** The user completes delivery, collects payment and learns from the first transaction.
-
-- [ ] Support customer onboarding
-- [ ] Define delivery checklist
-- [ ] Track delivery effort and direct costs
-- [ ] Record payment
-- [ ] Collect customer feedback
-- [ ] Capture testimonial or case-study permission
-- [ ] Summarize lessons
-- [ ] Recommend what to repeat, change or stop
-
-### M8 — Repeatable business system
-
-**User outcome:** The user turns early evidence into a more repeatable acquisition and delivery process.
-
-- [ ] Refine positioning
-- [ ] Refine offer and pricing
-- [ ] Identify repeatable acquisition channel
-- [ ] Create essential brand assets
-- [ ] Create landing or sales page only when justified
-- [ ] Standardize delivery
-- [ ] Identify automation opportunities
-- [ ] Track simple unit economics
-- [ ] Define next growth experiment
-
-## 5. Enabling platform milestones
-
-These should be introduced when they support an active product outcome.
-
-### Accounts and persistence
-
-- [ ] Authentication
-- [ ] Save and resume workflow
-- [ ] Multiple business projects
-- [ ] Durable Blueprint and Evidence Log
-- [ ] Data export
-- [ ] Account and data deletion
-
-### Product analytics
-
-- [ ] Define event taxonomy aligned with Product Method
-- [ ] Track stage conversion
-- [ ] Track real-world action events
-- [ ] Track generation failures and retries
-- [ ] Create privacy-conscious analytics implementation
-
-### Commercial foundation
-
-- [ ] Usage limits
-- [ ] Billing
-- [ ] Privacy policy
-- [ ] Terms of service
-- [ ] Cookie and analytics review
-- [ ] Production monitoring
-- [ ] Custom domain
-- [ ] Support workflow
-
-## 6. Prioritization rules
-
-Prioritize a backlog item only when it:
-
-- increases the probability that a user starts a real business;
-- reduces a major point of friction in the current method stage;
-- produces better user or market learning;
-- supports the current milestone;
-- reduces a material technical or trust risk;
-- enables measurement of a key entrepreneurial outcome.
-
-Do not prioritize a feature simply because it is common in SaaS products.
-
-## 7. Explicitly deferred
-
-Until evidence justifies them, avoid prioritizing:
-
-- broad social or community features;
+- generic chat features;
+- long business plans;
 - complex dashboards;
 - large template libraries;
-- autonomous agents acting without clear user control;
-- website building before validation;
-- extensive financial forecasting before first revenue;
-- multi-provider AI abstraction without a concrete need;
+- autonomous agents without clear control;
+- major software or operational builds before evidence;
+- extensive financial forecasting;
 - native mobile applications;
-- gamification disconnected from business action.
+- gamification disconnected from real business progress.
