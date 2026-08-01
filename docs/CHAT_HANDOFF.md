@@ -12,7 +12,7 @@ The first AI-generated company is a recommended starting proposal, not a final d
 - refine it;
 - request something substantially different.
 
-The company should feel real and launchable while remaining open to evolution.
+After the user chooses a company, OneDayCompany now generates the shortest practical path for making it real. The plan is not a static business plan: it is the operational navigation of the company.
 
 Collaboration with Marco is in Italian. Public UI copy remains in English. AI-generated company content follows the language used by the user in the initial context.
 
@@ -23,26 +23,34 @@ Landing
   ↓
 Company Beginning
   ↓
-Animated company creation loading
+Company creation loading
   ↓
 Company proposal
   ├── Continue with the proposal
   ├── Refine the proposal
   └── Show something different
         ↓
-      Animated loading
+      Company creation loading
   ↓
-Architect
+Execution Plan loading
+  ↓
+Execution Plan
+  ↓
+Start first step
+  ↓
+Current Architect placeholder
 ```
 
-## 3. Completed in the latest milestone
+The current Architect remains a temporary destination for the first execution step. It will be replaced by focused workflow hosts in a later milestone.
+
+## 3. Completed milestones
 
 ### Guided Company Beginning
 
 - Replaced the old Skills Form with a short, non-evaluative Company Beginning experience.
 - The user can begin from interests, passions, knowledge, lived experience, imagination or something they want to create.
 - Generation returns one coherent company proposal.
-- The company contract now includes:
+- The current `Company` contract includes:
   - `id`
   - `name`
   - `tagline`
@@ -78,34 +86,47 @@ Architect
 - The current company and refinement request are passed through the service, API route and AI generator.
 - The prompt instructs the model to preserve unaffected strengths and change only what is necessary.
 
-### Proposal action hierarchy
+### Execution Plan v1
 
-The proposal page now uses this hierarchy:
+- Added a structured Execution Plan generated after the user chooses a company.
+- The plan contains between three and five ordered steps.
+- Every step:
+  - begins with an action;
+  - has one primary objective;
+  - produces a visible, usable or verifiable outcome;
+  - is realistic for one person;
+  - is designed for low initial cost;
+  - is associated with a supported workflow type.
+- The AI generates only plan content.
+- The application owns:
+  - identifiers;
+  - ordering;
+  - status;
+  - timestamps;
+  - output references;
+  - generation source.
+- AI output is validated through strict JSON Schema and Zod.
+- A deterministic fallback plan is returned when AI generation fails.
+- Regenerating or refining a company clears the previous plan.
+- Returning from the current Architect preserves the generated plan.
 
-1. `Continue with {company.name}` — primary action.
-2. `Refine this proposal` — secondary action.
-3. `Show me something different` — tertiary action.
+### Execution Plan loading
 
-This avoids implying that every proposal is automatically wrong or must be refined.
+- Added `ExecutionPlanLoading.tsx`.
+- The company creation loading and execution planning loading are now separate experiences.
+- The Execution Plan transition uses:
+  - `Every company starts differently.`
+  - `We're preparing the simplest path for this one.`
+- Rotating messages describe the practical work being organized:
+  - understanding what the company needs first;
+  - choosing the simplest actions;
+  - putting steps in the right order;
+  - preparing the company path.
+- The transition does not mention AI, analysis or generic generation.
 
-### Language behavior
+## 4. Current technical pipelines
 
-- The model detects the language used in the user's initial description.
-- All generated customer-facing company content is returned in that language.
-- The company name remains in the language that sounds most natural.
-
-### AI infrastructure
-
-- Added a shared OpenAI client in `app/lib/openai.ts`.
-- Local development can use `HTTP_PROXY` or `HTTPS_PROXY` through CNTLM.
-- Proxy use is optional.
-- Vercel uses the normal direct connection because no proxy variables are configured there.
-- Company generation uses structured output plus Zod validation.
-- JSON Schema limits mirror the Zod limits.
-- Longer output allowance prevents refinement JSON from being truncated.
-- A temporary `/api/openai-health` route was used to verify connectivity and may be removed once production is stable.
-
-## 4. Current technical pipeline
+### Company generation
 
 ```text
 UI
@@ -125,26 +146,90 @@ Zod validation
 typed Company output
 ```
 
-The API returns:
+### Execution Plan generation
 
-```ts
-{
-  company: Company;
-  source: "ai" | "fallback";
-}
+```text
+UI
+  ↓
+executionPlanService
+  ↓
+POST /api/execution-plan
+  ↓
+shared OpenAI client
+  ↓
+OpenAI Responses API
+  ↓
+strict JSON Schema
+  ↓
+Zod validation
+  ↓
+application materialization
+  ↓
+typed CompanyExecutionPlan
 ```
 
-A deterministic fallback remains available when AI generation fails.
+Both pipelines retain deterministic fallback behavior.
 
-## 5. Important current files
+## 5. Execution Plan contract
+
+The generated content contains:
+
+```ts
+type GeneratedExecutionPlan = {
+  introduction: string;
+  steps: Array<{
+    title: string;
+    reason: string;
+    expectedOutcome: string;
+    workflowType: ExecutionWorkflowType;
+    completionCriteria: string[];
+  }>;
+};
+```
+
+The application materializes:
+
+```ts
+type CompanyExecutionPlan = {
+  id: string;
+  companyId: string;
+  introduction: string;
+  steps: ExecutionStep[];
+  version: number;
+  source: "ai" | "fallback";
+  createdAt: string;
+  updatedAt: string;
+};
+```
+
+Supported workflow types currently include:
+
+```text
+offer-builder
+landing-page-builder
+booking-builder
+contact-builder
+social-launch-builder
+outreach-builder
+pricing-builder
+portfolio-builder
+custom-guided-step
+```
+
+`custom-guided-step` is a controlled fallback for valid actions that do not yet have a specialized builder. It must not become a generic chat.
+
+## 6. Important current files
 
 ```text
 app/page.tsx
+
 app/components/CompanyBeginning.tsx
 app/components/CompanyCreationLoading.tsx
 app/components/BusinessOpportunitiesScreen.tsx
 app/components/OpportunityCard.tsx
 app/components/RefinementDrawer.tsx
+app/components/ExecutionPlanLoading.tsx
+app/components/ExecutionPlanScreen.tsx
 app/components/Architect.tsx
 
 app/lib/openai.ts
@@ -154,30 +239,44 @@ app/lib/aiBusinessOpportunitiesGenerator.ts
 app/lib/fallbackBusinessGenerator.ts
 app/lib/prompts/businessOpportunitiesPrompt.ts
 
+app/lib/executionPlanService.ts
+app/lib/executionPlanSchema.ts
+app/lib/aiExecutionPlanGenerator.ts
+app/lib/fallbackExecutionPlanGenerator.ts
+app/lib/prompts/executionPlanPrompt.ts
+
 app/api/business-opportunities/route.ts
-app/api/openai-health/route.ts
+app/api/execution-plan/route.ts
 
 app/types/business.ts
 ```
 
-## 6. Next coherent milestone
+## 7. Next coherent milestone
 
-### Guided Company Evolution v2
+### First focused execution workflow
 
-The next milestone should improve refinement without turning the product into a generic chatbot.
+Replace the temporary transition from the first Execution Plan step to the placeholder Architect with one focused workflow.
 
-Recommended focus:
+Recommended first candidate:
 
-- assess the current drawer through user testing;
-- decide whether refinement needs conversational history;
-- preserve previous company versions;
-- allow the user to compare or restore a prior proposal;
-- improve loading copy for initial generation versus refinement;
-- redesign Architect around the accepted or refined `Company`.
+```text
+offer-builder
+```
 
-Do not implement full opportunity history or a general-purpose chat unless testing shows it is necessary.
+The milestone should:
 
-## 7. Technical environment
+- introduce a `WorkflowHost` or equivalent typed routing layer;
+- open the workflow selected by `workflowType`;
+- keep one screen and one objective;
+- use the selected company and execution step as context;
+- produce one structured output;
+- define explicit completion criteria;
+- update the step status without losing the plan;
+- avoid generic conversational UI.
+
+Do not implement all workflow types at once.
+
+## 8. Technical environment
 
 Local corporate networking may require CNTLM:
 
@@ -201,7 +300,7 @@ Rules:
 - keep proxy support conditional;
 - keep the shared OpenAI client as the single connection layer.
 
-## 8. Working rules
+## 9. Working rules
 
 - Work on one coherent milestone per chat.
 - Prefer small, verifiable changes.

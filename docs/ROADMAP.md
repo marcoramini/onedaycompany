@@ -16,7 +16,7 @@
 
 ### M2 — Visible Company Creation
 
-**Goal:** Make AI generation feel like visible progress rather than an unexplained wait.
+**Goal:** Make company generation feel like visible progress rather than an unexplained wait.
 
 - [x] Add a dedicated animated loading screen.
 - [x] Rotate short progress messages with fade transitions.
@@ -42,47 +42,100 @@
 - [x] Add shared OpenAI client with optional local proxy support.
 - [x] Align JSON Schema and Zod field limits.
 
+### M4 — Execution Plan v1
+
+**Goal:** Turn the selected company into a short, ordered and immediately actionable path.
+
+- [x] Generate between three and five ordered execution steps.
+- [x] Require one practical objective per step.
+- [x] Require a visible, usable or verifiable outcome.
+- [x] Associate each step with a supported workflow type.
+- [x] Add strict JSON Schema and Zod validation.
+- [x] Keep IDs, status, timestamps and output references application-managed.
+- [x] Add deterministic fallback plan generation.
+- [x] Add a dedicated Execution Plan screen.
+- [x] Preserve the plan when returning from the current Architect.
+- [x] Clear the plan when the company is regenerated or refined.
+- [x] Add a distinct Execution Plan loading experience.
+- [x] Keep company creation and execution planning transitions separate.
+
 ## Current milestone
 
-### M4 — Guided Company Evolution v2
+### M5 — First Focused Execution Workflow
 
-**Goal:** Turn refinement into a dependable collaborative workflow without creating a generic chatbot.
+**Goal:** Replace the placeholder Architect transition with one real workflow that completes a concrete company-building objective.
 
-Potential deliverables:
+Recommended first workflow:
 
-- [ ] Test the refinement drawer with real users.
-- [ ] Improve refinement-specific loading messages.
-- [ ] Preserve prior company versions in session state.
-- [ ] Allow restoration of the previous proposal after refinement.
-- [ ] Decide whether limited conversational history is necessary.
-- [ ] Improve error handling so failed refinements preserve the current company and request.
-- [ ] Remove the temporary OpenAI health route once production connectivity is confirmed.
+```text
+offer-builder
+```
+
+Deliverables:
+
+- [ ] Add a typed `WorkflowHost` or equivalent routing layer.
+- [ ] Open a workflow from the selected Execution Plan step.
+- [ ] Pass the current `Company` and `ExecutionStep` as structured context.
+- [ ] Define a dedicated offer-builder contract.
+- [ ] Generate or refine one concrete first offer.
+- [ ] Avoid a generic chat interface.
+- [ ] Save one structured workflow output.
+- [ ] Mark the execution step as `in_progress` and then `completed`.
+- [ ] Return to the Execution Plan without losing outputs or status.
+- [ ] Preserve deterministic fallback behavior where AI generation is used.
+- [ ] Run `npm run build`.
+- [ ] Review the diff.
+- [ ] Update documentation.
 
 ## Upcoming
 
-### M5 — Architect Redesign
+### M6 — Workflow Library v1
 
-**Goal:** Continue from the accepted or refined `Company` entity and produce the first concrete launch assets.
+**Goal:** Add a small set of reusable, focused workflows without building a generic agent system.
 
-- [ ] Replace placeholder Architect progress with real guided steps.
-- [ ] Define the first offer in greater detail.
-- [ ] Create a public landing-page foundation.
-- [ ] Add a contact or conversion mechanism.
-- [ ] Prepare a concrete path to the first customer.
+Candidate workflows:
 
-### M6 — Proposal History and Comparison
+- [ ] `landing-page-builder`
+- [ ] `booking-builder`
+- [ ] `contact-builder`
+- [ ] `outreach-builder`
+- [ ] `pricing-builder`
+- [ ] `portfolio-builder`
+- [ ] `social-launch-builder`
+- [ ] controlled `custom-guided-step`
 
-**Goal:** Give users control over meaningful alternatives without overwhelming them.
+Each workflow must:
 
-- [ ] Store prior proposals and refinements.
-- [ ] Distinguish alternatives from revisions.
-- [ ] Compare a small number of proposals.
-- [ ] Restore a previous version.
+- have one objective;
+- use a typed input contract;
+- produce a structured output;
+- define completion criteria;
+- update company or plan state explicitly.
+
+### M7 — Persistence and Company Ownership
+
+**Goal:** Let the user preserve a company and continue building without making registration feel like an interruption.
+
+- [ ] Define the first persistence boundary.
+- [ ] Decide when temporary session data becomes a saved company.
+- [ ] Add a free account flow tied to saving progress.
+- [ ] Preserve the company, execution plan, workflow outputs and statuses.
+- [ ] Frame registration as continuing or saving the company, not accessing generic features.
+- [ ] Add privacy, deletion and basic account-management requirements.
+
+### M8 — Proposal and Plan History
+
+**Goal:** Preserve meaningful changes without overwhelming the user.
+
+- [ ] Store prior company proposals and refinements.
+- [ ] Distinguish company alternatives from revisions.
+- [ ] Version Execution Plans when the active company changes materially.
+- [ ] Restore a previous company or plan version.
 - [ ] Avoid turning history into a complex idea-management system.
 
-### M7 — Product Localization
+### M9 — Product Localization
 
-**Goal:** Support Italian test users while preserving English as the default public product language.
+**Goal:** Support Italian test users while preserving English as the default fixed product language.
 
 - [ ] Add explicit English / Italian UI selection.
 - [ ] Centralize fixed UI copy in a small dictionary.
@@ -94,6 +147,7 @@ Potential deliverables:
 - [ ] Run `npm run build` before every push.
 - [ ] Keep prompts separate from implementation.
 - [ ] Keep structured output and Zod schemas aligned.
+- [ ] Keep AI-generated content separate from application-managed state.
 - [ ] Never commit `.env.local`, API keys or proxy credentials.
 - [ ] Keep local proxy support optional so Vercel uses direct connectivity.
 - [ ] Update `CHAT_HANDOFF.md`, `ROADMAP.md` and `CHANGELOG.md` after substantial milestones.

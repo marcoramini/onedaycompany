@@ -6,16 +6,27 @@ import Architect from "./components/Architect";
 import BusinessOpportunitiesScreen from "./components/BusinessOpportunitiesScreen";
 import CompanyBeginning from "./components/CompanyBeginning";
 import CompanyCreationLoading from "./components/CompanyCreationLoading";
+import ExecutionPlanLoading from "./components/ExecutionPlanLoading";
+import ExecutionPlanScreen from "./components/ExecutionPlanScreen";
 import Landing from "./components/Landing";
 import RefinementDrawer from "./components/RefinementDrawer";
 import { generateBusinessOpportunity } from "./lib/businessOpportunitiesService";
+import {
+  requestExecutionPlan,
+} from "./lib/executionPlanService";
+import type {
+  CompanyExecutionPlan,
+  ExecutionStep,
+} from "./lib/executionPlanSchema";
 import type { Company } from "./types/business";
 
 type Screen =
   | "landing"
   | "beginning"
   | "loading"
+  | "planning"
   | "opportunity"
+  | "execution-plan"
   | "architect";
 
 export default function Home() {
@@ -27,6 +38,12 @@ export default function Home() {
 
   const [company, setCompany] =
     useState<Company | null>(null);
+
+  const [executionPlan, setExecutionPlan] =
+    useState<CompanyExecutionPlan | null>(null);
+
+  const [activeExecutionStep, setActiveExecutionStep] =
+    useState<ExecutionStep | null>(null);
 
   const [isGenerating, setIsGenerating] =
     useState(false);
@@ -55,6 +72,8 @@ export default function Home() {
     }
 
     setBeginningContext(normalizedContext);
+    setExecutionPlan(null);
+    setActiveExecutionStep(null);
     setIsGenerating(true);
     setError(null);
     setCurrentScreen("loading");
@@ -92,6 +111,8 @@ export default function Home() {
 
     const previousCompany = company;
 
+    setExecutionPlan(null);
+    setActiveExecutionStep(null);
     setIsGenerating(true);
     setError(null);
     setCurrentScreen("loading");
@@ -132,6 +153,8 @@ export default function Home() {
 
     const currentCompany = company;
 
+    setExecutionPlan(null);
+    setActiveExecutionStep(null);
     setIsRefinementOpen(false);
     setIsGenerating(true);
     setError(null);
@@ -166,11 +189,46 @@ export default function Home() {
     }
   }
 
-  function handleChooseCompany() {
-    if (!company) {
+  async function handleChooseCompany() {
+    if (!company || isGenerating) {
       return;
     }
 
+    setIsGenerating(true);
+    setError(null);
+    setCurrentScreen("planning");
+
+    try {
+      const generatedPlan =
+        await requestExecutionPlan(
+          company,
+          beginningContext,
+        );
+
+      setExecutionPlan(generatedPlan);
+      setCurrentScreen("execution-plan");
+    } catch (error) {
+      console.error(
+        "Execution plan generation failed.",
+        error,
+      );
+
+      setError(
+        error instanceof Error
+          ? error.message
+          : "We couldn't prepare your company path.",
+      );
+
+      setCurrentScreen("opportunity");
+    } finally {
+      setIsGenerating(false);
+    }
+  }
+
+  function handleStartExecutionStep(
+    step: ExecutionStep,
+  ) {
+    setActiveExecutionStep(step);
     setError(null);
     setCurrentScreen("architect");
   }
@@ -190,10 +248,23 @@ export default function Home() {
     setCurrentScreen("opportunity");
   }
 
+  function handleBackToExecutionPlan() {
+    setError(null);
+
+    if (executionPlan) {
+      setCurrentScreen("execution-plan");
+      return;
+    }
+
+    setCurrentScreen("opportunity");
+  }
+
   function handleRestart() {
     setCurrentScreen("landing");
     setBeginningContext("");
     setCompany(null);
+    setExecutionPlan(null);
+    setActiveExecutionStep(null);
     setError(null);
     setIsGenerating(false);
     setIsRefinementOpen(false);
@@ -220,6 +291,17 @@ export default function Home() {
 
   if (currentScreen === "loading") {
     return <CompanyCreationLoading />;
+  }
+
+  if (
+    currentScreen === "planning" &&
+    company
+  ) {
+    return (
+      <ExecutionPlanLoading
+        companyName={company.name}
+      />
+    );
   }
 
   if (
@@ -256,13 +338,28 @@ export default function Home() {
   }
 
   if (
+    currentScreen === "execution-plan" &&
+    company &&
+    executionPlan
+  ) {
+    return (
+      <ExecutionPlanScreen
+        company={company}
+        plan={executionPlan}
+        onBack={handleBackToCompany}
+        onStartStep={handleStartExecutionStep}
+      />
+    );
+  }
+
+  if (
     currentScreen === "architect" &&
     company
   ) {
     return (
       <Architect
         company={company}
-        onBack={handleBackToCompany}
+        onBack={handleBackToExecutionPlan}
         onRestart={handleRestart}
       />
     );

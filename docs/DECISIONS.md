@@ -85,7 +85,7 @@ Prompts should be framed as encouraging steps in starting the company. Avoid lan
 
 OneDayCompany presents the business as already coming to life from the first interaction.
 
-The product should not sell a distant future or ask the user to imagine where they will be in one year. Today is the moment of change; tomorrow the user continues improving the business one practical step at a time.
+The product should support continuous progress for as long as the user wants to continue. It must not imply that the user should stop after a predetermined daily amount of work.
 
 ---
 
@@ -199,12 +199,6 @@ The JSON Schema used for generation and the Zod schema used for application vali
 
 Prompts are stored as typed TypeScript modules outside implementation files, with one file per product capability where practical.
 
-Example:
-
-```text
-app/lib/prompts/businessOpportunitiesPrompt.ts
-```
-
 ---
 
 ## DEC-019 — Provider independence with proportionate abstraction
@@ -235,7 +229,7 @@ Screen-level UI and reusable components remain separate from `page.tsx`. Workflo
 
 **Status:** Accepted
 
-As the onboarding evolves into proposal history, refinement and selection, navigation should use explicit typed workflow state rather than unrelated independent booleans.
+As the product evolves into proposal history, execution plans and focused workflows, navigation should use explicit typed workflow state rather than unrelated independent booleans.
 
 ---
 
@@ -257,8 +251,6 @@ npm run build
 
 The first generated company must be presented as OneDayCompany’s recommended starting proposal, not as a final or unquestionable answer.
 
-The interface must avoid implying either that the proposal is definitive or that it is already wrong.
-
 The user should see three clear choices:
 
 1. continue with the proposal;
@@ -273,19 +265,19 @@ The user should see three clear choices:
 
 Refinement should preserve the current company’s strongest unaffected parts and change only what is necessary to satisfy the user’s request.
 
-The system should not generate an unrelated company during refinement unless the user explicitly asks for a fundamentally different direction.
-
 The first refinement interface is a guided drawer with suggestions and a free-text field, not an open-ended generic chatbot.
 
 ---
 
 ## DEC-026 — Loading communicates visible progress
 
-**Status:** Accepted
+**Status:** Revised and accepted
 
-AI generation and refinement should use a dedicated loading experience with short rotating progress messages.
+Long-running generation should use short, product-specific progress messages rather than generic AI language.
 
-The loading experience should reassure the user that OneDayCompany is actively building or reshaping the company, rather than leaving the interface apparently frozen.
+Company creation and execution planning are different product moments and use separate loading experiences.
+
+The Execution Plan transition communicates that OneDayCompany is organizing the simplest path for the selected company. It does not mention AI, analysis or generic generation.
 
 ---
 
@@ -298,3 +290,62 @@ All OpenAI server-side calls use a shared client module.
 When `HTTP_PROXY` or `HTTPS_PROXY` is configured locally, the client routes requests through the proxy. When those variables are absent, including on Vercel, the client uses a direct connection.
 
 Proxy configuration, credentials and `.env.local` must never be committed.
+
+---
+
+## DEC-028 — The Execution Plan is operational navigation
+
+**Status:** Accepted
+
+After the user chooses a company, OneDayCompany generates between three and five ordered execution steps.
+
+The Execution Plan is not a static checklist, strategic document or business plan. It is the operational navigation of the active company.
+
+Each step must:
+
+- begin with a concrete action;
+- have one primary objective;
+- produce a visible, usable or verifiable result;
+- be realistic for one person;
+- remain low-cost;
+- move the company toward launch, customers or revenue;
+- connect to a focused workflow type.
+
+---
+
+## DEC-029 — AI plans; the application owns execution state
+
+**Status:** Accepted
+
+For Execution Plans, AI generates only:
+
+- introduction;
+- title;
+- reason;
+- expected outcome;
+- workflow type;
+- completion criteria.
+
+The application owns:
+
+- identifiers;
+- ordering;
+- status;
+- timestamps;
+- output references;
+- source metadata;
+- versioning.
+
+AI must not regenerate or overwrite application-managed execution state.
+
+---
+
+## DEC-030 — Focused workflows, not generic chat
+
+**Status:** Accepted
+
+Each Execution Plan step opens a workflow dedicated to one objective.
+
+Workflow types are a controlled application capability set. The model may select a supported workflow type, but the application validates and routes it.
+
+`custom-guided-step` may support valid actions without a dedicated builder, but it must still use a structured, goal-oriented flow and must not become a generic chatbot.
