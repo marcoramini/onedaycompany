@@ -5,6 +5,7 @@ import type { Company } from "../types/business";
 type OpportunityCardProps = {
   company: Company;
   onChooseCompany: () => void;
+  onRefineProposal: () => void;
   onTryDifferentDirection: () => void;
   isGenerating?: boolean;
 };
@@ -21,6 +22,7 @@ const startupCostLabels: Record<
 export default function OpportunityCard({
   company,
   onChooseCompany,
+  onRefineProposal,
   onTryDifferentDirection,
   isGenerating = false,
 }: OpportunityCardProps) {
@@ -28,7 +30,7 @@ export default function OpportunityCard({
     <article className="overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-sm">
       <section className="border-b border-slate-200 px-6 py-12 text-center sm:px-10 sm:py-16">
         <p className="mb-4 text-xs font-semibold uppercase tracking-[0.22em] text-violet-600">
-          Welcome to your new company
+          A first proposal for your company
         </p>
 
         <h1 className="text-4xl font-semibold tracking-tight text-slate-950 sm:text-6xl">
@@ -40,9 +42,9 @@ export default function OpportunityCard({
         </p>
 
         <p className="mx-auto mt-6 max-w-xl text-base leading-relaxed text-slate-500">
-          Built around what you already know, enjoy, and care
-          about. This is the company you can start bringing to
-          life today.
+          Based on what you shared, this is the direction
+          we believe has the strongest potential. You can
+          refine it or ask us to explore another proposal.
         </p>
       </section>
 
@@ -117,35 +119,57 @@ export default function OpportunityCard({
         </Section>
       </div>
 
-      <section className="border-t border-slate-200 px-6 py-10 text-center sm:px-10 sm:py-12">
-        <p className="text-sm font-semibold uppercase tracking-[0.18em] text-violet-600">
-          Your company starts today
-        </p>
+      <section className="border-t border-slate-200 px-6 py-10 sm:px-10 sm:py-12">
+        <div className="mx-auto max-w-3xl text-center">
+          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-violet-600">
+            Make this proposal yours
+          </p>
 
-        <h2 className="mx-auto mt-3 max-w-2xl text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">
-          Let&apos;s turn {company.name} into something real.
-        </h2>
+          <h2 className="mt-3 text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">
+            {company.name} already has a strong foundation.
+          </h2>
 
-        <button
-          type="button"
-          onClick={onChooseCompany}
-          disabled={isGenerating}
-          className="mt-7 w-full rounded-full bg-slate-950 px-7 py-4 font-medium text-white transition hover:bg-violet-700 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
-        >
-          Let&apos;s build {company.name}
-        </button>
+          <p className="mx-auto mt-4 max-w-2xl text-base leading-7 text-slate-500">
+            Continue with this proposal, refine a few details, or explore a
+            completely different direction.
+          </p>
 
-        <div className="mt-4">
-          <button
-            type="button"
-            onClick={onTryDifferentDirection}
-            disabled={isGenerating}
-            className="text-sm font-medium text-slate-500 underline decoration-slate-300 underline-offset-4 transition hover:text-slate-950 hover:decoration-slate-950 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {isGenerating
-              ? "Shaping another company..."
-              : "Try a different direction"}
-          </button>
+          <div className="mt-8 flex flex-col items-stretch justify-center gap-3 sm:flex-row">
+            <button
+              type="button"
+              onClick={onChooseCompany}
+              disabled={isGenerating}
+              className="inline-flex min-h-14 items-center justify-center rounded-full bg-slate-950 px-7 py-4 font-semibold text-white transition hover:-translate-y-0.5 hover:bg-violet-700 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0"
+            >
+              Continue with {company.name}
+            </button>
+
+            <button
+              type="button"
+              onClick={onRefineProposal}
+              disabled={isGenerating}
+              className="inline-flex min-h-14 items-center justify-center rounded-full border border-violet-300 bg-white px-7 py-4 font-semibold text-violet-700 transition hover:-translate-y-0.5 hover:border-violet-500 hover:bg-violet-50 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0"
+            >
+              Refine this proposal
+            </button>
+          </div>
+
+          <div className="mt-5">
+            <button
+              type="button"
+              onClick={onTryDifferentDirection}
+              disabled={isGenerating}
+              className="inline-flex items-center gap-2 text-sm font-medium text-slate-500 transition hover:text-slate-950 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {isGenerating
+                ? "Shaping another company..."
+                : "Show me something different"}
+
+              {!isGenerating ? (
+                <span aria-hidden="true">→</span>
+              ) : null}
+            </button>
+          </div>
         </div>
       </section>
     </article>

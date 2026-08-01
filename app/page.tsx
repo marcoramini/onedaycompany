@@ -5,13 +5,16 @@ import { useState } from "react";
 import Architect from "./components/Architect";
 import BusinessOpportunitiesScreen from "./components/BusinessOpportunitiesScreen";
 import CompanyBeginning from "./components/CompanyBeginning";
+import CompanyCreationLoading from "./components/CompanyCreationLoading";
 import Landing from "./components/Landing";
+import RefinementDrawer from "./components/RefinementDrawer";
 import { generateBusinessOpportunity } from "./lib/businessOpportunitiesService";
 import type { Company } from "./types/business";
 
 type Screen =
   | "landing"
   | "beginning"
+  | "loading"
   | "opportunity"
   | "architect";
 
@@ -26,6 +29,9 @@ export default function Home() {
     useState<Company | null>(null);
 
   const [isGenerating, setIsGenerating] =
+    useState(false);
+
+  const [isRefinementOpen, setIsRefinementOpen] =
     useState(false);
 
   const [error, setError] =
@@ -51,6 +57,7 @@ export default function Home() {
     setBeginningContext(normalizedContext);
     setIsGenerating(true);
     setError(null);
+    setCurrentScreen("loading");
 
     try {
       const generatedCompany =
@@ -71,6 +78,8 @@ export default function Home() {
           ? error.message
           : "We could not shape your company. Please try again.",
       );
+
+      setCurrentScreen("beginning");
     } finally {
       setIsGenerating(false);
     }
@@ -81,23 +90,77 @@ export default function Home() {
       return;
     }
 
+    const previousCompany = company;
+
     setIsGenerating(true);
     setError(null);
+    setCurrentScreen("loading");
 
     try {
       const generatedCompany =
         await generateBusinessOpportunity(
           beginningContext,
-          company,
+          previousCompany,
         );
 
       setCompany(generatedCompany);
+      setCurrentScreen("opportunity");
     } catch (error) {
+      console.error(
+        "Alternative company generation failed.",
+        error,
+      );
+
       setError(
         error instanceof Error
           ? error.message
-          : "We couldn't shape another company.",
+          : "We couldn't shape another proposal.",
       );
+
+      setCurrentScreen("opportunity");
+    } finally {
+      setIsGenerating(false);
+    }
+  }
+
+  async function handleRefineCompany(
+    refinementRequest: string,
+  ) {
+    if (!company || !beginningContext || isGenerating) {
+      return;
+    }
+
+    const currentCompany = company;
+
+    setIsRefinementOpen(false);
+    setIsGenerating(true);
+    setError(null);
+    setCurrentScreen("loading");
+
+    try {
+      const refinedCompany =
+        await generateBusinessOpportunity(
+          beginningContext,
+          currentCompany,
+          refinementRequest,
+        );
+
+      setCompany(refinedCompany);
+      setCurrentScreen("opportunity");
+    } catch (error) {
+      console.error(
+        "Company refinement failed.",
+        error,
+      );
+
+      setError(
+        error instanceof Error
+          ? error.message
+          : "We couldn't refine this proposal.",
+      );
+
+      setCurrentScreen("opportunity");
+      setIsRefinementOpen(true);
     } finally {
       setIsGenerating(false);
     }
@@ -118,6 +181,7 @@ export default function Home() {
     }
 
     setError(null);
+    setIsRefinementOpen(false);
     setCurrentScreen("beginning");
   }
 
@@ -132,6 +196,7 @@ export default function Home() {
     setCompany(null);
     setError(null);
     setIsGenerating(false);
+    setIsRefinementOpen(false);
   }
 
   if (currentScreen === "landing") {
@@ -153,21 +218,40 @@ export default function Home() {
     );
   }
 
+  if (currentScreen === "loading") {
+    return <CompanyCreationLoading />;
+  }
+
   if (
     currentScreen === "opportunity" &&
     company
   ) {
     return (
-      <BusinessOpportunitiesScreen
-        company={company}
-        isGenerating={isGenerating}
-        error={error}
-        onBack={handleBackToBeginning}
-        onChooseCompany={handleChooseCompany}
-        onTryDifferentDirection={
-          handleTryDifferentDirection
-        }
-      />
+      <>
+        <BusinessOpportunitiesScreen
+          company={company}
+          isGenerating={isGenerating}
+          error={error}
+          onBack={handleBackToBeginning}
+          onChooseCompany={handleChooseCompany}
+          onRefineProposal={() => {
+            setError(null);
+            setIsRefinementOpen(true);
+          }}
+          onTryDifferentDirection={
+            handleTryDifferentDirection
+          }
+        />
+
+        <RefinementDrawer
+          isOpen={isRefinementOpen}
+          companyName={company.name}
+          onClose={() =>
+            setIsRefinementOpen(false)
+          }
+          onSubmit={handleRefineCompany}
+        />
+      </>
     );
   }
 

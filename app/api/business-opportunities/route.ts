@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
 import { ZodError } from "zod";
 
-import type { Company } from "@/app/types/business";
-
 import { generateAiBusinessOpportunities } from "../../lib/aiBusinessOpportunitiesGenerator";
 import {
   businessOpportunitiesRequestSchema,
@@ -12,39 +10,35 @@ import { generateFallbackBusinessOpportunities } from "../../lib/fallbackBusines
 
 export const runtime = "nodejs";
 
-type RequestBody = {
-  context?: string;
-  previousCompany?: Company;
-};
-
 export async function POST(
   request: Request,
 ) {
   try {
-    const rawBody =
-      (await request.json()) as RequestBody;
+    const rawBody: unknown =
+      await request.json();
 
-    const { context } =
+    const {
+      context,
+      previousCompany,
+      refinementRequest,
+    } =
       businessOpportunitiesRequestSchema.parse(
         rawBody,
       );
-
-    const previousCompany =
-      rawBody.previousCompany
-        ? companySchema.parse(
-            rawBody.previousCompany,
-          )
-        : undefined;
 
     try {
       const company =
         await generateAiBusinessOpportunities(
           context,
           previousCompany,
+          refinementRequest,
         );
 
-      console.log("Company generated with AI:", company.name);
-      
+      console.log(
+        "Company generated with AI:",
+        company.name,
+      );
+
       return NextResponse.json({
         company: companySchema.parse(company),
         source: "ai",
@@ -60,7 +54,10 @@ export async function POST(
           context,
         );
 
-      console.warn("Returning fallback company:", company.name);
+      console.warn(
+        "Returning fallback company:",
+        company.name,
+      );
 
       return NextResponse.json({
         company: companySchema.parse(company),
@@ -72,7 +69,7 @@ export async function POST(
       return NextResponse.json(
         {
           error:
-            "Please share something meaningful to build your company from.",
+            "Please check the information provided and try again.",
           details: error.flatten(),
         },
         {

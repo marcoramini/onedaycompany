@@ -4,11 +4,15 @@ This document records durable decisions. It is not a daily diary.
 
 ---
 
-## DEC-001 — Product language
+## DEC-001 — Product and generated-content language
 
-**Status:** Accepted
+**Status:** Revised and accepted
 
-All public product content, UI labels, user-facing prompts and generated product copy are written in English. Development discussions with Marco are conducted in Italian.
+Public product UI labels and fixed product copy are written in English.
+
+Development discussions with Marco are conducted in Italian.
+
+AI-generated company content follows the language used by the user in the initial context. The company name should remain in the language that sounds most natural and should not be translated unnecessarily.
 
 ---
 
@@ -20,7 +24,7 @@ The canonical mission is:
 
 > OneDayCompany helps people turn what they already have into a business they are proud to build.
 
-The earlier formulation, “transforms skills into businesses,” is now too narrow because the product may begin from interests, passions, experience, knowledge, imagination or aspirations—not only explicit skills.
+The earlier formulation, “transforms skills into businesses,” is too narrow because the product may begin from interests, passions, experience, knowledge, imagination or aspirations—not only explicit skills.
 
 ---
 
@@ -69,7 +73,7 @@ Every interaction must reinforce that the user already has enough to begin. The 
 
 **Status:** Accepted
 
-The initial interaction may use a conversational interface, but it must not feel like an interview, questionnaire or generic chat.
+The initial interaction may use conversational elements, but it must not feel like an interview, questionnaire or generic chat.
 
 Prompts should be framed as encouraging steps in starting the company. Avoid language that assumes entrepreneurial expertise, such as asking for the first customer, target market or validated problem before the user is ready.
 
@@ -101,21 +105,21 @@ The primary CTA is:
 
 ---
 
-## DEC-009 — One Business Opportunity at a time
+## DEC-009 — One company proposal at a time
 
 **Status:** Accepted
 
-The intended experience generates one Business Opportunity at a time.
+The intended experience generates one company proposal at a time.
 
-After receiving it, the user should be able to:
+After receiving it, the user can:
 
 - continue building it;
 - refine it;
-- request a different direction.
+- request a substantially different proposal.
 
-Previous opportunities remain available for later selection.
+The proposal is a guided starting point, not a final decision.
 
-This replaces the long-term product direction of presenting exactly three opportunities simultaneously.
+This replaces the earlier direction of presenting exactly three opportunities simultaneously.
 
 ---
 
@@ -165,15 +169,15 @@ Public communication focuses on the user, their company and concrete progress. A
 
 **Status:** Accepted
 
-AI may generate and refine opportunities, but the user explicitly decides what to continue building. Generated assumptions must not be presented as validated facts.
+AI may generate and refine company proposals, but the user explicitly decides what to continue building. Generated assumptions must not be presented as validated facts.
 
 ---
 
-## DEC-016 — Low-cost, simple and launchable opportunities
+## DEC-016 — Low-cost, simple and launchable companies
 
 **Status:** Accepted
 
-Business proposals should be realistic for one person, begin with very low or almost no initial investment and avoid unnecessary operational complexity.
+Company proposals should be realistic for one person, begin with very low or almost no initial investment and avoid unnecessary operational complexity.
 
 They should feel like recognizable companies, not merely obvious freelance services.
 
@@ -184,6 +188,8 @@ They should feel like recognizable companies, not merely obvious freelance servi
 **Status:** Accepted
 
 Core AI-generated application data must use structured contracts and validation before reaching UI state.
+
+The JSON Schema used for generation and the Zod schema used for application validation must remain aligned, including field-length constraints.
 
 ---
 
@@ -196,7 +202,7 @@ Prompts are stored as typed TypeScript modules outside implementation files, wit
 Example:
 
 ```text
-app/lib/prompts/businessOpportunityPrompt.ts
+app/lib/prompts/businessOpportunitiesPrompt.ts
 ```
 
 ---
@@ -229,7 +235,7 @@ Screen-level UI and reusable components remain separate from `page.tsx`. Workflo
 
 **Status:** Accepted
 
-As the onboarding evolves into conversation, opportunity history, refinement and selection, navigation should use explicit typed workflow state rather than independent booleans.
+As the onboarding evolves into proposal history, refinement and selection, navigation should use explicit typed workflow state rather than unrelated independent booleans.
 
 ---
 
@@ -242,3 +248,53 @@ Before every push, run:
 ```bash
 npm run build
 ```
+
+---
+
+## DEC-024 — The first proposal is a starting point
+
+**Status:** Accepted
+
+The first generated company must be presented as OneDayCompany’s recommended starting proposal, not as a final or unquestionable answer.
+
+The interface must avoid implying either that the proposal is definitive or that it is already wrong.
+
+The user should see three clear choices:
+
+1. continue with the proposal;
+2. refine it;
+3. request something substantially different.
+
+---
+
+## DEC-025 — Refinement evolves the current company
+
+**Status:** Accepted
+
+Refinement should preserve the current company’s strongest unaffected parts and change only what is necessary to satisfy the user’s request.
+
+The system should not generate an unrelated company during refinement unless the user explicitly asks for a fundamentally different direction.
+
+The first refinement interface is a guided drawer with suggestions and a free-text field, not an open-ended generic chatbot.
+
+---
+
+## DEC-026 — Loading communicates visible progress
+
+**Status:** Accepted
+
+AI generation and refinement should use a dedicated loading experience with short rotating progress messages.
+
+The loading experience should reassure the user that OneDayCompany is actively building or reshaping the company, rather than leaving the interface apparently frozen.
+
+---
+
+## DEC-027 — Shared OpenAI client with optional proxy support
+
+**Status:** Accepted
+
+All OpenAI server-side calls use a shared client module.
+
+When `HTTP_PROXY` or `HTTPS_PROXY` is configured locally, the client routes requests through the proxy. When those variables are absent, including on Vercel, the client uses a direct connection.
+
+Proxy configuration, credentials and `.env.local` must never be committed.

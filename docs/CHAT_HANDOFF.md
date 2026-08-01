@@ -4,75 +4,117 @@
 
 OneDayCompany helps people turn what they already have into a business they are proud to build.
 
-The product is for people who may not consider themselves entrepreneurs, may not have a clear business idea and may underestimate their skills. It should help them begin today from interests, passions, experience, knowledge, curiosity or imagination.
+The product starts from what the user loves, knows, has experienced, imagines or would like to create. It must not require a business idea or evaluate whether the user is entrepreneurial enough.
 
-OneDayCompany never evaluates the user. Every interaction reinforces that the user already has enough to begin and that their company is already taking shape.
+The first AI-generated company is a recommended starting proposal, not a final decision. The user can:
 
-Public UI and product copy are in English. Collaboration with Marco is in Italian.
+- continue with the proposal;
+- refine it;
+- request something substantially different.
 
-## 2. Product principles established in the latest session
+The company should feel real and launchable while remaining open to evolution.
 
-- The company begins today, not in a distant imagined future.
-- Tomorrow is for continued improvement, one practical step at a time.
-- The product must guide rather than interview.
-- Initial prompts must not assume entrepreneurial knowledge.
-- Avoid asking for a first customer, target market or similar founder concepts at the beginning.
-- Everything the user already has can count.
-- The interaction should help the user recognize value in themselves and what they love doing.
-- Generate one Business Opportunity at a time.
-- The user can build it, refine it or request another direction.
-- Previously generated opportunities remain available for later selection.
+Collaboration with Marco is in Italian. Public UI copy remains in English. AI-generated company content follows the language used by the user in the initial context.
 
-## 3. Landing decision
-
-The accepted central message is:
-
-> Love what you build. Build what you love. Start today.
-
-Primary CTA:
-
-> Start my company
-
-Supporting concepts:
-
-> You already have something worth building.
-
-> You don't need a business idea. You only need to begin.
-
-A replacement `Landing.tsx` was proposed with:
-
-- minimal header;
-- large three-line hero;
-- violet emphasis on `Start today.`;
-- dark primary CTA;
-- three lower sections: `Begin as you are`, `Build today`, `Grow every day`.
-
-Repository code remains the first source of truth. Confirm whether this proposed component has been pasted into the repository, then run `npm run build` before committing or deploying.
-
-## 4. Current repository flow before the next milestone
+## 2. Current repository flow
 
 ```text
 Landing
   ↓
-Skills form
+Company Beginning
   ↓
-Three Business Opportunities
+Animated company creation loading
   ↓
-The Architect
+Company proposal
+  ├── Continue with the proposal
+  ├── Refine the proposal
+  └── Show something different
+        ↓
+      Animated loading
+  ↓
+Architect
 ```
 
-This current flow is technically functional but no longer matches the intended product direction.
+## 3. Completed in the latest milestone
 
-## 5. Existing technical foundation to preserve
+### Guided Company Beginning
 
-The Business Opportunity pipeline currently includes:
+- Replaced the old Skills Form with a short, non-evaluative Company Beginning experience.
+- The user can begin from interests, passions, knowledge, lived experience, imagination or something they want to create.
+- Generation returns one coherent company proposal.
+- The company contract now includes:
+  - `id`
+  - `name`
+  - `tagline`
+  - `mission`
+  - `problem`
+  - `solution`
+  - `firstOffer`
+  - `idealCustomers`
+  - `whyNow`
+  - `futureExpansion`
+  - `startupCost`
+- The proposal page presents the result as a recommended starting point rather than a final answer.
+- The user can request a substantially different proposal.
+- The previous company is sent back to the model so alternatives are meaningfully different.
+
+### Company creation loading
+
+- Added `CompanyCreationLoading.tsx`.
+- The loading screen rotates short progress messages with fade transitions.
+- It is shown:
+  - after the initial `Shape my company` action;
+  - when requesting another proposal;
+  - while refining the current proposal.
+
+### Proposal refinement v1
+
+- Added `RefinementDrawer.tsx`.
+- The drawer provides:
+  - guided refinement suggestions;
+  - a free-text request;
+  - one clear refinement action.
+- Refinement evolves the current company instead of generating an unrelated one.
+- The current company and refinement request are passed through the service, API route and AI generator.
+- The prompt instructs the model to preserve unaffected strengths and change only what is necessary.
+
+### Proposal action hierarchy
+
+The proposal page now uses this hierarchy:
+
+1. `Continue with {company.name}` — primary action.
+2. `Refine this proposal` — secondary action.
+3. `Show me something different` — tertiary action.
+
+This avoids implying that every proposal is automatically wrong or must be refined.
+
+### Language behavior
+
+- The model detects the language used in the user's initial description.
+- All generated customer-facing company content is returned in that language.
+- The company name remains in the language that sounds most natural.
+
+### AI infrastructure
+
+- Added a shared OpenAI client in `app/lib/openai.ts`.
+- Local development can use `HTTP_PROXY` or `HTTPS_PROXY` through CNTLM.
+- Proxy use is optional.
+- Vercel uses the normal direct connection because no proxy variables are configured there.
+- Company generation uses structured output plus Zod validation.
+- JSON Schema limits mirror the Zod limits.
+- Longer output allowance prevents refinement JSON from being truncated.
+- A temporary `/api/openai-health` route was used to verify connectivity and may be removed once production is stable.
+
+## 4. Current technical pipeline
 
 ```text
 UI
   ↓
-businessOpportunityService
+businessOpportunitiesService
   ↓
 POST /api/business-opportunities
+  ↓
+shared OpenAI client
   ↓
 OpenAI Responses API
   ↓
@@ -80,97 +122,90 @@ strict JSON Schema
   ↓
 Zod validation
   ↓
-typed BusinessDirection output
+typed Company output
 ```
 
-Resilience includes a deterministic fallback generator and an API source indicator (`ai` or `fallback`).
+The API returns:
 
-Prompts are separated from implementation, currently using a module such as:
-
-```text
-app/lib/prompts/businessOpportunityPrompt.ts
+```ts
+{
+  company: Company;
+  source: "ai" | "fallback";
+}
 ```
 
-The existing output contract generates exactly three opportunities. The next milestone will intentionally change this to one opportunity at a time.
+A deterministic fallback remains available when AI generation fails.
 
-## 6. Current opportunity model
-
-The opportunity structure has been migrated to:
-
-```text
-id
-name
-motto
-vision
-overview
-skillAffinity
-distinctiveness
-initialCapital
-additionalSkills
-```
-
-The prompt was improved to produce differentiated, branded and customer-facing businesses rather than three versions of generic consulting.
-
-Do not continue optimizing the old three-card prompt before redesigning the onboarding and one-opportunity flow.
-
-## 7. Next coherent milestone
-
-### Guided Company Beginning v1
-
-Replace `SkillsForm` with a short guided interaction that:
-
-- starts from what the user loves, knows, imagines or wants to create;
-- does not feel like an interview or assessment;
-- avoids narrow or entrepreneurial questions;
-- provides encouragement and visible progress;
-- gathers enough context to generate one company proposal;
-- reinforces that the company is already being built.
-
-Then adapt generation to return one opportunity and support:
-
-- `Let's build this`
-- `Refine this idea`
-- `Try a different direction`
-- saved previous opportunities
-
-Work in small steps. The first step in the next chat should be product/UX design of the replacement for `SkillsForm`, followed by identification of affected files. Do not implement the entire opportunity history architecture in the first change unless it is required by the chosen smallest milestone.
-
-## 8. Likely affected files
-
-Confirm paths against the repository before changes:
+## 5. Important current files
 
 ```text
 app/page.tsx
-app/components/SkillsForm.tsx
+app/components/CompanyBeginning.tsx
+app/components/CompanyCreationLoading.tsx
 app/components/BusinessOpportunitiesScreen.tsx
 app/components/OpportunityCard.tsx
-app/lib/businessOpportunityService.ts
-app/lib/businessOpportunitySchema.ts
-app/lib/aiBusinessOpportunityGenerator.ts
+app/components/RefinementDrawer.tsx
+app/components/Architect.tsx
+
+app/lib/openai.ts
+app/lib/businessOpportunitiesService.ts
+app/lib/businessOpportunitiesSchema.ts
+app/lib/aiBusinessOpportunitiesGenerator.ts
 app/lib/fallbackBusinessGenerator.ts
-app/lib/prompts/businessOpportunityPrompt.ts
+app/lib/prompts/businessOpportunitiesPrompt.ts
+
 app/api/business-opportunities/route.ts
+app/api/openai-health/route.ts
+
 app/types/business.ts
 ```
 
-New components and types may be preferable rather than forcing the new concept into `SkillsForm`.
+## 6. Next coherent milestone
 
-## 9. Technical environment
+### Guided Company Evolution v2
 
-Local corporate network may require an optional local bridge such as CNTLM:
+The next milestone should improve refinement without turning the product into a generic chatbot.
+
+Recommended focus:
+
+- assess the current drawer through user testing;
+- decide whether refinement needs conversational history;
+- preserve previous company versions;
+- allow the user to compare or restore a prior proposal;
+- improve loading copy for initial generation versus refinement;
+- redesign Architect around the accepted or refined `Company`.
+
+Do not implement full opportunity history or a general-purpose chat unless testing shows it is necessary.
+
+## 7. Technical environment
+
+Local corporate networking may require CNTLM:
 
 ```text
-Next.js → LOCAL_PROXY_URL → local bridge → corporate NTLM proxy → OpenAI
+Next.js
+  ↓
+HTTP_PROXY / HTTPS_PROXY
+  ↓
+CNTLM
+  ↓
+corporate proxy
+  ↓
+OpenAI
 ```
 
-Never commit `.env.local`, secrets, proxy credentials or bridge configuration. Do not configure `LOCAL_PROXY_URL` on Vercel.
+Rules:
 
-## 10. Working rules
+- never commit `.env.local`;
+- never commit proxy credentials;
+- do not configure local proxy variables on Vercel;
+- keep proxy support conditional;
+- keep the shared OpenAI client as the single connection layer.
 
-- One coherent milestone per chat.
-- Small, verifiable changes.
-- Discuss alternatives before significant architecture changes.
+## 8. Working rules
+
+- Work on one coherent milestone per chat.
+- Prefer small, verifiable changes.
 - Clearly identify affected files.
-- Do not silently revise accepted decisions.
+- Do not silently revise accepted product or architectural decisions.
 - Run `npm run build` before every push.
 - Update `CHAT_HANDOFF.md`, `ROADMAP.md` and `CHANGELOG.md` after substantial work.

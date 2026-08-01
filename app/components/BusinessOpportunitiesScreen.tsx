@@ -7,6 +7,7 @@ type BusinessOpportunitiesScreenProps = {
   error: string | null;
   onBack: () => void;
   onChooseCompany: () => void;
+  onRefineProposal: () => void;
   onTryDifferentDirection: () => void;
 };
 
@@ -16,6 +17,7 @@ export default function BusinessOpportunitiesScreen({
   error,
   onBack,
   onChooseCompany,
+  onRefineProposal,
   onTryDifferentDirection,
 }: BusinessOpportunitiesScreenProps) {
   return (
@@ -31,7 +33,10 @@ export default function BusinessOpportunitiesScreen({
         </button>
 
         {error ? (
-          <div className="mb-6 rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-red-700">
+          <div
+            role="alert"
+            className="mb-6 rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-red-700"
+          >
             {error}
           </div>
         ) : null}
@@ -40,6 +45,7 @@ export default function BusinessOpportunitiesScreen({
           company={company}
           isGenerating={isGenerating}
           onChooseCompany={onChooseCompany}
+          onRefineProposal={onRefineProposal}
           onTryDifferentDirection={
             onTryDifferentDirection
           }

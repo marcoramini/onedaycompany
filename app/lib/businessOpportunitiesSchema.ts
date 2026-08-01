@@ -9,7 +9,11 @@ export const startupCostSchema = z.enum([
 export const firstOfferSchema = z.object({
   name: z.string().trim().min(1).max(120),
 
-  description: z.string().trim().min(1).max(500),
+  description: z
+    .string()
+    .trim()
+    .min(1)
+    .max(500),
 
   outcome: z.string().trim().min(1).max(300),
 });
@@ -44,20 +48,37 @@ export const companySchema = z.object({
 
   whyNow: z.string().trim().min(1).max(500),
 
-  futureExpansion: z.string().trim().min(1).max(400),
+  futureExpansion: z
+    .string()
+    .trim()
+    .min(1)
+    .max(400),
 
   startupCost: startupCostSchema,
 });
 
-export const businessOpportunitiesResponseSchema = z.object({
-  company: companySchema,
-});
+export const businessOpportunitiesResponseSchema =
+  z.object({
+    company: companySchema,
+  });
 
-export const businessOpportunitiesRequestSchema = z.object({
-  context: z.string().trim().min(1).max(4_000),
-});
+export const businessOpportunitiesRequestSchema =
+  z.object({
+    context: z.string().trim().min(1).max(4_000),
 
-export type CompanyOutput = z.infer<typeof companySchema>;
+    previousCompany: companySchema.optional(),
+
+    refinementRequest: z
+      .string()
+      .trim()
+      .min(1)
+      .max(2_000)
+      .optional(),
+  });
+
+export type CompanyOutput = z.infer<
+  typeof companySchema
+>;
 
 export type BusinessOpportunitiesOutput = z.infer<
   typeof businessOpportunitiesResponseSchema

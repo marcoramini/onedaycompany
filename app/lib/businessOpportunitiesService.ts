@@ -13,6 +13,7 @@ type BusinessOpportunitiesApiResponse = {
 export async function generateBusinessOpportunity(
   context: string,
   previousCompany?: Company,
+  refinementRequest?: string,
 ): Promise<Company> {
   const response = await fetch(
     "/api/business-opportunities",
@@ -24,6 +25,7 @@ export async function generateBusinessOpportunity(
       body: JSON.stringify({
         context,
         previousCompany,
+        refinementRequest,
       }),
     },
   );
@@ -31,7 +33,10 @@ export async function generateBusinessOpportunity(
   const data =
     (await response.json()) as BusinessOpportunitiesApiResponse;
 
-  console.log("Company generation source:", data.source);
+  console.log(
+    "Company generation source:",
+    data.source,
+  );
 
   if (!response.ok) {
     throw new Error(

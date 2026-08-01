@@ -102,7 +102,42 @@ The result must remain:
 - realistic for one person;
 - capable of being launched today.
 
-Use English for all generated content.
+Detect the language used by the user in the provided context.
+
+Generate all customer-facing content in that same language.
+
+This includes:
+
+- tagline
+- mission
+- problem
+- solution
+- first offer
+- ideal customers
+- why now
+- future expansion
+
+Keep the company name in the language that sounds most natural. Do not translate it unnecessarily.
+
+The input may include a section named "Current company" followed by a
+"Refinement request".
+
+When both sections are present:
+
+- treat the current company as the existing version of the business;
+- improve that same company according to the user's refinement request;
+- preserve the strongest parts that are not affected by the request;
+- change only what is necessary to satisfy the requested refinement;
+- keep the result coherent as one company;
+- do not generate a completely unrelated company unless the user explicitly
+  asks for a fundamentally different direction;
+- preserve the company name when it still fits the refined positioning;
+- change the company name only when the requested changes make the existing
+  name misleading or inappropriate;
+- ensure that all fields remain consistent with one another after the change.
+
+A refinement request takes precedence over the rules for generating a
+different alternative company.
 
 Hard length limits:
 - company name: 120 characters

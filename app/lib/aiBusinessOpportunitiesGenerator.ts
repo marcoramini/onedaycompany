@@ -146,15 +146,65 @@ const BUSINESS_OPPORTUNITIES_JSON_SCHEMA = {
   additionalProperties: false,
 } as const;
 
+function formatCompanyForPrompt(
+  company: Company,
+): string {
+  return `
+Name: ${company.name}
+Tagline: ${company.tagline}
+Mission: ${company.mission}
+Problem: ${company.problem}
+Solution: ${company.solution}
+
+First offer:
+- Name: ${company.firstOffer.name}
+- Description: ${company.firstOffer.description}
+- Outcome: ${company.firstOffer.outcome}
+
+Ideal customers:
+${company.idealCustomers
+  .map((customer) => `- ${customer}`)
+  .join("\n")}
+
+Why now: ${company.whyNow}
+Future expansion: ${company.futureExpansion}
+Startup cost: ${company.startupCost}
+  `.trim();
+}
+
 function buildGenerationInput(
   context: string,
   previousCompany?: Company,
+  refinementRequest?: string,
 ): string {
-  if (!previousCompany) {
+  if (
+    previousCompany &&
+    refinementRequest
+  ) {
     return `
 User context:
 
 ${context}
+
+Current company:
+
+${formatCompanyForPrompt(previousCompany)}
+
+Refinement request:
+
+${refinementRequest}
+    `.trim();
+  }
+
+  if (previousCompany) {
+    return `
+User context:
+
+${context}
+
+Previous company:
+
+${formatCompanyForPrompt(previousCompany)}
     `.trim();
   }
 
@@ -162,34 +212,13 @@ ${context}
 User context:
 
 ${context}
-
-Previous company:
-
-Name: ${previousCompany.name}
-Tagline: ${previousCompany.tagline}
-Mission: ${previousCompany.mission}
-Problem: ${previousCompany.problem}
-Solution: ${previousCompany.solution}
-
-First offer:
-- Name: ${previousCompany.firstOffer.name}
-- Description: ${previousCompany.firstOffer.description}
-- Outcome: ${previousCompany.firstOffer.outcome}
-
-Ideal customers:
-${previousCompany.idealCustomers
-  .map((customer) => `- ${customer}`)
-  .join("\n")}
-
-Why now: ${previousCompany.whyNow}
-Future expansion: ${previousCompany.futureExpansion}
-Startup cost: ${previousCompany.startupCost}
   `.trim();
 }
 
 export async function generateAiBusinessOpportunities(
   context: string,
   previousCompany?: Company,
+  refinementRequest?: string,
 ): Promise<CompanyOutput> {
   const normalizedContext = context.trim();
 
@@ -198,6 +227,9 @@ export async function generateAiBusinessOpportunities(
       "A starting context is required.",
     );
   }
+
+  const normalizedRefinementRequest =
+    refinementRequest?.trim();
 
   const response = await openai.responses.create({
     model: "gpt-5",
@@ -208,13 +240,14 @@ export async function generateAiBusinessOpportunities(
     input: buildGenerationInput(
       normalizedContext,
       previousCompany,
+      normalizedRefinementRequest,
     ),
 
     reasoning: {
       effort: "low",
     },
 
-    max_output_tokens: 1_500,
+    max_output_tokens: 3_000,
 
     text: {
       format: {
@@ -226,6 +259,15 @@ export async function generateAiBusinessOpportunities(
       },
     },
   });
+
+  if (response.status === "incomplete") {
+    throw new Error(
+      `OpenAI returned an incomplete response: ${
+        response.incomplete_details?.reason ??
+        "unknown reason"
+      }`,
+    );
+  }
 
   if (!response.output_text) {
     throw new Error(
