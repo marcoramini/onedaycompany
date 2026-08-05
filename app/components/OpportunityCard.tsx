@@ -141,7 +141,7 @@ export default function OpportunityCard({
               disabled={isGenerating}
               className="inline-flex min-h-14 items-center justify-center rounded-full bg-slate-950 px-7 py-4 font-semibold text-white transition hover:-translate-y-0.5 hover:bg-violet-700 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0"
             >
-              Continue with {company.name}
+              Let&apos;s build {company.name}
             </button>
 
             <button

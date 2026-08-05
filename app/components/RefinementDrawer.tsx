@@ -33,12 +33,6 @@ export default function RefinementDrawer({
     useState("");
 
   useEffect(() => {
-    if (isOpen) {
-      setRefinementRequest("");
-    }
-  }, [isOpen]);
-
-  useEffect(() => {
     if (!isOpen) {
       return;
     }

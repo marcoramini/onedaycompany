@@ -2,7 +2,6 @@
 
 import {
   type FormEvent,
-  useEffect,
   useState,
 } from "react";
 
@@ -25,10 +24,6 @@ export default function CompanyBeginning({
 }: CompanyBeginningProps) {
   const [context, setContext] =
     useState(initialValue);
-
-  useEffect(() => {
-    setContext(initialValue);
-  }, [initialValue]);
 
   async function handleSubmit(
     event: FormEvent<HTMLFormElement>,

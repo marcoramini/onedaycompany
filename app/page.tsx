@@ -3,29 +3,24 @@
 import { useState } from "react";
 
 import Architect from "./components/Architect";
+import SaveCompanyScreen from "./components/auth/SaveCompanyScreen";
 import BusinessOpportunitiesScreen from "./components/BusinessOpportunitiesScreen";
 import CompanyBeginning from "./components/CompanyBeginning";
 import CompanyCreationLoading from "./components/CompanyCreationLoading";
-import ExecutionPlanLoading from "./components/ExecutionPlanLoading";
 import ExecutionPlanScreen from "./components/ExecutionPlanScreen";
 import Landing from "./components/Landing";
 import RefinementDrawer from "./components/RefinementDrawer";
+import { savePendingCompany } from "./api/companies/pendingCompany";
 import { generateBusinessOpportunity } from "./lib/businessOpportunitiesService";
-import {
-  requestExecutionPlan,
-} from "./lib/executionPlanService";
-import type {
-  CompanyExecutionPlan,
-  ExecutionStep,
-} from "./lib/executionPlanSchema";
+import type { CompanyExecutionPlan } from "./lib/executionPlanSchema";
 import type { Company } from "./types/business";
 
 type Screen =
   | "landing"
   | "beginning"
   | "loading"
-  | "planning"
   | "opportunity"
+  | "authentication"
   | "execution-plan"
   | "architect";
 
@@ -41,9 +36,6 @@ export default function Home() {
 
   const [executionPlan, setExecutionPlan] =
     useState<CompanyExecutionPlan | null>(null);
-
-  const [activeExecutionStep, setActiveExecutionStep] =
-    useState<ExecutionStep | null>(null);
 
   const [isGenerating, setIsGenerating] =
     useState(false);
@@ -73,7 +65,6 @@ export default function Home() {
 
     setBeginningContext(normalizedContext);
     setExecutionPlan(null);
-    setActiveExecutionStep(null);
     setIsGenerating(true);
     setError(null);
     setCurrentScreen("loading");
@@ -86,15 +77,15 @@ export default function Home() {
 
       setCompany(generatedCompany);
       setCurrentScreen("opportunity");
-    } catch (error) {
+    } catch (generationError) {
       console.error(
         "Company generation failed.",
-        error,
+        generationError,
       );
 
       setError(
-        error instanceof Error
-          ? error.message
+        generationError instanceof Error
+          ? generationError.message
           : "We could not shape your company. Please try again.",
       );
 
@@ -105,14 +96,17 @@ export default function Home() {
   }
 
   async function handleTryDifferentDirection() {
-    if (!company || !beginningContext || isGenerating) {
+    if (
+      !company ||
+      !beginningContext ||
+      isGenerating
+    ) {
       return;
     }
 
     const previousCompany = company;
 
     setExecutionPlan(null);
-    setActiveExecutionStep(null);
     setIsGenerating(true);
     setError(null);
     setCurrentScreen("loading");
@@ -126,15 +120,15 @@ export default function Home() {
 
       setCompany(generatedCompany);
       setCurrentScreen("opportunity");
-    } catch (error) {
+    } catch (generationError) {
       console.error(
         "Alternative company generation failed.",
-        error,
+        generationError,
       );
 
       setError(
-        error instanceof Error
-          ? error.message
+        generationError instanceof Error
+          ? generationError.message
           : "We couldn't shape another proposal.",
       );
 
@@ -147,14 +141,17 @@ export default function Home() {
   async function handleRefineCompany(
     refinementRequest: string,
   ) {
-    if (!company || !beginningContext || isGenerating) {
+    if (
+      !company ||
+      !beginningContext ||
+      isGenerating
+    ) {
       return;
     }
 
     const currentCompany = company;
 
     setExecutionPlan(null);
-    setActiveExecutionStep(null);
     setIsRefinementOpen(false);
     setIsGenerating(true);
     setError(null);
@@ -170,15 +167,15 @@ export default function Home() {
 
       setCompany(refinedCompany);
       setCurrentScreen("opportunity");
-    } catch (error) {
+    } catch (refinementError) {
       console.error(
         "Company refinement failed.",
-        error,
+        refinementError,
       );
 
       setError(
-        error instanceof Error
-          ? error.message
+        refinementError instanceof Error
+          ? refinementError.message
           : "We couldn't refine this proposal.",
       );
 
@@ -189,46 +186,26 @@ export default function Home() {
     }
   }
 
-  async function handleChooseCompany() {
-    if (!company || isGenerating) {
+  function handleChooseCompany() {
+    if (
+      !company ||
+      !beginningContext ||
+      isGenerating
+    ) {
       return;
     }
 
-    setIsGenerating(true);
+    savePendingCompany(
+      company,
+      beginningContext,
+    );
+
     setError(null);
-    setCurrentScreen("planning");
-
-    try {
-      const generatedPlan =
-        await requestExecutionPlan(
-          company,
-          beginningContext,
-        );
-
-      setExecutionPlan(generatedPlan);
-      setCurrentScreen("execution-plan");
-    } catch (error) {
-      console.error(
-        "Execution plan generation failed.",
-        error,
-      );
-
-      setError(
-        error instanceof Error
-          ? error.message
-          : "We couldn't prepare your company path.",
-      );
-
-      setCurrentScreen("opportunity");
-    } finally {
-      setIsGenerating(false);
-    }
+    setIsRefinementOpen(false);
+    setCurrentScreen("authentication");
   }
 
-  function handleStartExecutionStep(
-    step: ExecutionStep,
-  ) {
-    setActiveExecutionStep(step);
+  function handleStartExecutionStep() {
     setError(null);
     setCurrentScreen("architect");
   }
@@ -264,14 +241,17 @@ export default function Home() {
     setBeginningContext("");
     setCompany(null);
     setExecutionPlan(null);
-    setActiveExecutionStep(null);
     setError(null);
     setIsGenerating(false);
     setIsRefinementOpen(false);
   }
 
   if (currentScreen === "landing") {
-    return <Landing onStart={handleStart} />;
+    return (
+      <Landing
+        onStart={handleStart}
+      />
+    );
   }
 
   if (currentScreen === "beginning") {
@@ -291,17 +271,6 @@ export default function Home() {
 
   if (currentScreen === "loading") {
     return <CompanyCreationLoading />;
-  }
-
-  if (
-    currentScreen === "planning" &&
-    company
-  ) {
-    return (
-      <ExecutionPlanLoading
-        companyName={company.name}
-      />
-    );
   }
 
   if (
@@ -325,15 +294,32 @@ export default function Home() {
           }
         />
 
-        <RefinementDrawer
-          isOpen={isRefinementOpen}
-          companyName={company.name}
-          onClose={() =>
-            setIsRefinementOpen(false)
-          }
-          onSubmit={handleRefineCompany}
-        />
+        {isRefinementOpen ? (
+          <RefinementDrawer
+            isOpen
+            companyName={company.name}
+            onClose={() => {
+              setIsRefinementOpen(false);
+            }}
+            onSubmit={handleRefineCompany}
+          />
+        ) : null}
       </>
+    );
+  }
+
+  if (
+    currentScreen === "authentication" &&
+    company
+  ) {
+    return (
+      <SaveCompanyScreen
+        companyName={company.name}
+        onBack={() => {
+          setError(null);
+          setCurrentScreen("opportunity");
+        }}
+      />
     );
   }
 
@@ -365,5 +351,9 @@ export default function Home() {
     );
   }
 
-  return <Landing onStart={handleStart} />;
+  return (
+    <Landing
+      onStart={handleStart}
+    />
+  );
 }

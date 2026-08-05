@@ -51,7 +51,7 @@ export default function Landing({ onStart }: LandingProps) {
           </button>
 
           <p className="mt-5 text-sm text-slate-500">
-            You don't need a business idea. You only need to begin.
+            You don&apos;t need a business idea. You only need to begin.
           </p>
         </section>
       </div>
