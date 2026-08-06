@@ -1,3 +1,5 @@
+//file: app/components/CompanyBeginning.tsx
+
 "use client";
 
 import {

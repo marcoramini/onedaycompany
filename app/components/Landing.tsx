@@ -1,8 +1,22 @@
+//file: app/components/Landing.tsx
+
+import Link from "next/link";
+
 type LandingProps = {
-  onStart: () => void;
+  workspaceHref?: string;
 };
 
-export default function Landing({ onStart }: LandingProps) {
+export default function Landing({
+  workspaceHref,
+}: LandingProps) {
+  const accountHref =
+    workspaceHref ?? "/sign-in";
+
+  const accountLabel =
+    workspaceHref
+      ? "Open workspace"
+      : "Sign in";
+
   return (
     <main className="min-h-screen overflow-hidden bg-[#fcfcff] text-[#101935]">
       <div className="relative isolate">
@@ -11,22 +25,41 @@ export default function Landing({ onStart }: LandingProps) {
           className="pointer-events-none absolute left-1/2 top-0 -z-10 h-[34rem] w-[50rem] -translate-x-1/2 rounded-full bg-violet-100/60 blur-3xl"
         />
 
-        <header className="mx-auto flex w-full max-w-6xl justify-center px-6 py-8 sm:py-10">
-          <div className="text-center">
-            <p className="text-[0.72rem] font-bold uppercase tracking-[0.34em] text-violet-600">
-              OneDayCompany
-            </p>
+        <header className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-6 sm:py-7">
+          <Link
+            href="/"
+            aria-label="OneDayCompany home"
+            className="inline-flex items-center gap-2 text-lg font-semibold tracking-tight text-slate-950"
+          >
+            <span
+              aria-hidden="true"
+              className="flex h-9 w-9 items-center justify-center rounded-xl bg-violet-700 text-sm font-bold text-white"
+            >
+              O
+            </span>
 
-            <p className="mt-3 text-sm font-medium leading-6 text-violet-500">
-              Love what you build.
-              <br />
-              Build what you love.
-            </p>
-          </div>
+            <span>
+              OneDay
+              <span className="text-violet-700">
+                Company
+              </span>
+            </span>
+          </Link>
+
+          <Link
+            href={accountHref}
+            className="inline-flex min-h-11 items-center justify-center rounded-full px-4 text-sm font-semibold text-slate-600 transition hover:bg-white hover:text-violet-700 hover:shadow-sm"
+          >
+            {accountLabel}
+          </Link>
         </header>
 
-        <section className="mx-auto flex w-full max-w-6xl flex-col items-center px-6 pb-20 pt-10 text-center sm:pb-28 sm:pt-16">
-          <h1 className="max-w-5xl text-balance text-5xl font-semibold leading-[0.98] tracking-[-0.055em] text-[#080f2a] sm:text-6xl lg:text-8xl">
+        <section className="mx-auto flex w-full max-w-6xl flex-col items-center px-6 pb-20 pt-14 text-center sm:pb-28 sm:pt-20">
+          <p className="max-w-xl text-balance text-sm italic leading-6 text-slate-500 sm:text-base">
+            “Love what you build. Build what you love.”
+          </p>
+
+          <h1 className="mt-7 max-w-5xl text-balance text-5xl font-semibold leading-[0.98] tracking-[-0.055em] text-[#080f2a] sm:text-6xl lg:text-8xl">
             Build the business
             <br />
             that fits you.
@@ -36,22 +69,35 @@ export default function Landing({ onStart }: LandingProps) {
             Build a business around who you are.
           </p>
 
-          <button
-            type="button"
-            onClick={onStart}
+          <Link
+            href="/start"
             className="group mt-10 inline-flex min-h-16 items-center justify-center gap-4 rounded-2xl bg-[#080f2a] px-8 text-base font-semibold text-white shadow-[0_18px_50px_rgba(8,15,42,0.18)] transition duration-200 hover:-translate-y-0.5 hover:bg-violet-700 hover:shadow-[0_22px_60px_rgba(109,40,217,0.24)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-violet-300"
           >
             Start my company
+
             <span
               aria-hidden="true"
               className="transition-transform duration-200 group-hover:translate-x-1"
             >
               →
             </span>
-          </button>
+          </Link>
 
           <p className="mt-5 text-sm text-slate-500">
-            You don&apos;t need a business idea. You only need to begin.
+            You don&apos;t need a business idea. You
+            only need to begin.
+          </p>
+
+          <p className="mt-4 text-sm text-slate-500">
+            Already building with OneDayCompany?{" "}
+            <Link
+              href={accountHref}
+              className="font-semibold text-violet-700 transition hover:text-violet-900"
+            >
+              {workspaceHref
+                ? "Open your workspace"
+                : "Sign in"}
+            </Link>
           </p>
         </section>
       </div>
@@ -68,8 +114,9 @@ export default function Landing({ onStart }: LandingProps) {
             </h2>
 
             <p className="mt-3 leading-7 text-slate-600">
-              Your interests, experiences and way of seeing the world are a
-              real place to start.
+              Your interests, experiences and way of
+              seeing the world are a real place to
+              start.
             </p>
           </article>
 
@@ -83,8 +130,8 @@ export default function Landing({ onStart }: LandingProps) {
             </h2>
 
             <p className="mt-3 leading-7 text-slate-600">
-              Discover a company that fits you and start bringing it to life
-              immediately.
+              Discover a company that fits you and
+              start bringing it to life immediately.
             </p>
           </article>
 
@@ -98,7 +145,8 @@ export default function Landing({ onStart }: LandingProps) {
             </h2>
 
             <p className="mt-3 leading-7 text-slate-600">
-              Today you begin. Tomorrow you keep improving what you started.
+              Today you begin. Tomorrow you keep
+              improving what you started.
             </p>
           </article>
         </div>

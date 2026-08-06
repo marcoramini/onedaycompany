@@ -1,15 +1,39 @@
-import Link from "next/link";
+//file: app/console/[companyId]/page.tsx 
+
+import type { User } from "@supabase/supabase-js";
 import {
   notFound,
   redirect,
 } from "next/navigation";
 
+import CompanyConsoleHeader from "../../components/console/CompanyConsoleHeader";
+import CompanyOverview from "../../components/console/CompanyOverview";
+import CompanySwitcher from "../../components/console/CompanySwitcher";
+import ConsoleMobileHeader from "../../components/console/ConsoleMobileHeader";
+import ConsoleShell from "../../components/console/ConsoleShell";
+import ConsoleSidebar from "../../components/console/ConsoleSidebar";
+import ConsoleUserArea from "../../components/console/ConsoleUserArea";
+import OpenedCompanyTracker from "../../components/console/OpenedCompanyTracker";
+import { getUserCompanies } from "../../lib/companies/companyQueries";
 import { createClient } from "../../lib/supabase/server";
+
+import CompanyJourney from "../../components/console/CompanyJourney";
 
 type CompanyConsolePageProps = {
   params: Promise<{
     companyId: string;
   }>;
+};
+
+type PersistedCompany = {
+  id: string;
+  name: string;
+  tagline: string;
+  mission: string;
+  problem: string;
+  solution: string;
+  status: string;
+  active_stage: string;
 };
 
 type PersistedOffer = {
@@ -20,21 +44,10 @@ type PersistedOffer = {
   status: string;
 };
 
-type PersistedCompany = {
-  id: string;
-  name: string;
-  tagline: string;
-  mission: string;
-  status: string;
-  active_stage: string;
-  offers: PersistedOffer[];
-};
-
 export default async function CompanyConsolePage({
   params,
 }: CompanyConsolePageProps) {
   const { companyId } = await params;
-
   const supabase = await createClient();
 
   const {
@@ -42,12 +55,12 @@ export default async function CompanyConsolePage({
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect("/");
+    redirect("/sign-in");
   }
 
   const {
     data: company,
-    error,
+    error: companyError,
   } = await supabase
     .from("companies")
     .select(`
@@ -55,24 +68,19 @@ export default async function CompanyConsolePage({
       name,
       tagline,
       mission,
+      problem,
+      solution,
       status,
-      active_stage,
-      offers (
-        id,
-        name,
-        description,
-        outcome,
-        status
-      )
+      active_stage
     `)
     .eq("id", companyId)
     .eq("owner_id", user.id)
     .maybeSingle();
 
-  if (error) {
+  if (companyError) {
     console.error(
-      "Company console loading failed.",
-      error,
+      "Company workspace loading failed.",
+      companyError,
     );
 
     throw new Error(
@@ -84,161 +92,180 @@ export default async function CompanyConsolePage({
     notFound();
   }
 
+  const {
+    data: offer,
+    error: offerError,
+  } = await supabase
+    .from("offers")
+    .select(`
+      id,
+      name,
+      description,
+      outcome,
+      status
+    `)
+    .eq("company_id", companyId)
+    .order("created_at", {
+      ascending: true,
+    })
+    .limit(1)
+    .maybeSingle();
+
+  if (offerError) {
+    console.error(
+      "Company offer loading failed.",
+      offerError,
+    );
+
+    throw new Error(
+      "We couldn't load this company's offer.",
+    );
+  }
+
+  let companies;
+
+  try {
+    companies = await getUserCompanies(
+      supabase,
+      user.id,
+    );
+  } catch (companyListError) {
+    console.error(
+      "Company switcher loading failed.",
+      companyListError,
+    );
+
+    throw new Error(
+      "We couldn't load your companies.",
+    );
+  }
+
   const typedCompany =
     company as PersistedCompany;
 
   const initialOffer =
-    typedCompany.offers[0] ?? null;
+    (offer as PersistedOffer | null) ??
+    null;
+
+  const userName = getUserName(user);
+  const userEmail = user.email ?? null;
+
+  const companySwitcher = (
+    <CompanySwitcher
+      activeCompanyId={typedCompany.id}
+      companies={companies}
+    />
+  );
 
   return (
-    <main className="min-h-screen bg-slate-50 px-4 py-8 sm:px-6 sm:py-12">
-      <form
-  action="/auth/signout"
-  method="post"
->
-  <button
-    type="submit"
-    className="text-sm font-medium text-slate-500 transition hover:text-slate-950"
-  >
-    Sign out
-  </button>
-</form>
-      <div className="mx-auto max-w-6xl">
-        <header className="rounded-[2rem] border border-slate-200 bg-white px-6 py-8 shadow-sm sm:px-10">
-          <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-violet-600">
-                Company workspace
-              </p>
+    <>
+      <OpenedCompanyTracker
+        companyId={typedCompany.id}
+      />
 
-              <h1 className="mt-3 text-4xl font-semibold tracking-tight text-slate-950 sm:text-5xl">
-                {typedCompany.name}
-              </h1>
-
-              <p className="mt-4 max-w-2xl text-xl leading-8 text-slate-600">
-                {typedCompany.tagline}
-              </p>
-            </div>
-
-            <span className="self-start rounded-full bg-violet-100 px-4 py-2 text-sm font-semibold text-violet-800">
-              Foundation started
-            </span>
-          </div>
-        </header>
-
-        <section className="mt-6 grid gap-6 lg:grid-cols-[1.4fr_0.8fr]">
-          <article className="rounded-[2rem] border border-slate-200 bg-white px-6 py-8 shadow-sm sm:px-8">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
-              Your company foundation
-            </p>
-
-            <h2 className="mt-3 text-2xl font-semibold tracking-tight text-slate-950">
-              Your company is now saved
-            </h2>
-
-            <p className="mt-4 text-lg leading-8 text-slate-600">
-              {typedCompany.mission}
-            </p>
-
-            <div className="mt-8 grid gap-3 sm:grid-cols-2">
-              <FoundationItem
-                label="Company direction"
-                status="Ready"
-              />
-
-              <FoundationItem
-                label="First offer"
-                status={
-                  initialOffer
-                    ? "Ready"
-                    : "Not started"
+      <ConsoleShell
+        sidebar={
+          <ConsoleSidebar
+            companyId={typedCompany.id}
+            companySwitcher={
+              companySwitcher
+            }
+            userName={userName}
+            userEmail={userEmail}
+          />
+        }
+        mobileHeader={
+          <ConsoleMobileHeader
+            companyId={typedCompany.id}
+            companySwitcher={
+              <CompanySwitcher
+                activeCompanyId={
+                  typedCompany.id
                 }
+                companies={companies}
               />
-
-              <FoundationItem
-                label="Brand identity"
-                status="Next"
+            }
+            accountArea={
+              <ConsoleUserArea
+                userName={userName}
+                userEmail={userEmail}
+                compact
               />
+            }
+          />
+        }
+      >
+        <CompanyConsoleHeader
+          name={typedCompany.name}
+          tagline={typedCompany.tagline}
+          statusLabel={getCompanyStatusLabel(
+            typedCompany.status,
+            typedCompany.active_stage,
+          )}
+        />
 
-              <FoundationItem
-                label="Landing page"
-                status="Upcoming"
-              />
-            </div>
-          </article>
+        <CompanyJourney
+          hasCompanyFoundation
+          hasFirstOffer={Boolean(initialOffer)}
+        />
 
-          <aside className="rounded-[2rem] border border-violet-200 bg-violet-50 px-6 py-8 sm:px-8">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-violet-700">
-              Your next step
-            </p>
-
-            <h2 className="mt-3 text-2xl font-semibold tracking-tight text-slate-950">
-              Shape your first offer
-            </h2>
-
-            <p className="mt-4 leading-7 text-slate-600">
-              Turn the starting offer into something
-              clear, valuable and ready to present to
-              a real customer.
-            </p>
-
-            {initialOffer ? (
-              <div className="mt-6 rounded-2xl bg-white p-5">
-                <p className="font-semibold text-slate-950">
-                  {initialOffer.name}
-                </p>
-
-                <p className="mt-2 text-sm leading-6 text-slate-600">
-                  {initialOffer.outcome}
-                </p>
-              </div>
-            ) : null}
-
-            <button
-              type="button"
-              disabled
-              className="mt-7 inline-flex min-h-12 w-full items-center justify-center rounded-full bg-slate-950 px-6 py-3 font-semibold text-white opacity-50"
-            >
-              Continue building
-            </button>
-
-            <p className="mt-3 text-center text-sm text-slate-500">
-              The focused workspace is coming next.
-            </p>
-          </aside>
-        </section>
-
-        <div className="mt-8 text-center">
-          <Link
-            href="/"
-            className="text-sm font-medium text-slate-500 transition hover:text-slate-950"
-          >
-            Return to OneDayCompany
-          </Link>
-        </div>
-      </div>
-    </main>
+        <CompanyOverview
+          mission={typedCompany.mission}
+          problem={typedCompany.problem}
+          solution={typedCompany.solution}
+          initialOffer={initialOffer}
+        />
+      </ConsoleShell>
+    </>
   );
 }
 
-type FoundationItemProps = {
-  label: string;
-  status: string;
-};
+function getUserName(user: User) {
+  const fullName =
+    user.user_metadata.full_name;
 
-function FoundationItem({
-  label,
-  status,
-}: FoundationItemProps) {
-  return (
-    <div className="rounded-2xl border border-slate-200 px-5 py-4">
-      <p className="font-medium text-slate-950">
-        {label}
-      </p>
+  if (
+    typeof fullName === "string" &&
+    fullName.trim()
+  ) {
+    return fullName.trim();
+  }
 
-      <p className="mt-1 text-sm text-slate-500">
-        {status}
-      </p>
-    </div>
+  const name = user.user_metadata.name;
+
+  if (
+    typeof name === "string" &&
+    name.trim()
+  ) {
+    return name.trim();
+  }
+
+  return user.email ?? "Company owner";
+}
+
+function getCompanyStatusLabel(
+  status: string,
+  activeStage: string,
+) {
+  const source =
+    activeStage.trim() || status.trim();
+
+  if (!source) {
+    return "Foundation started";
+  }
+
+  return formatStatus(source);
+}
+
+function formatStatus(value: string) {
+  const normalized = value
+    .trim()
+    .replace(/[_-]+/g, " ")
+    .replace(/\s+/g, " ");
+
+  return normalized.replace(
+    /\b\w/g,
+    (character) =>
+      character.toUpperCase(),
   );
 }

@@ -1,5 +1,10 @@
+//file: app/lib/supabase/server.ts
+
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
+import { serverFetch } from "../network/serverFetch";
+
+
 
 export async function createClient() {
   const supabaseUrl =
@@ -26,6 +31,10 @@ export async function createClient() {
     supabaseUrl,
     supabasePublishableKey,
     {
+      global: {
+        fetch: serverFetch,
+      },
+
       cookies: {
         getAll() {
           return cookieStore.getAll();
@@ -44,10 +53,10 @@ export async function createClient() {
             );
           } catch {
             /*
-             * Server Components cannot always write cookies.
-             * The root Proxy is responsible for refreshing
-             * and persisting the authenticated session.
-             */
+            * Cookie writes may be unavailable inside
+            * Server Components. The Proxy persists
+            * refreshed sessions.
+            */
           }
         },
       },

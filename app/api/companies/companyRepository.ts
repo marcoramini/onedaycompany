@@ -47,6 +47,7 @@ export async function createCompanyWithOffer(
     .from("companies")
     .insert({
       owner_id: ownerId,
+      last_opened_at: new Date().toISOString(),
       source_proposal_id: company.id,
       name: company.name,
       slug,

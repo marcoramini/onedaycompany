@@ -1,4 +1,5 @@
 import { createServerClient } from "@supabase/ssr";
+import { serverFetch } from "../network/serverFetch";
 import {
   NextResponse,
   type NextRequest,
@@ -32,6 +33,10 @@ export async function updateSession(
     supabaseUrl,
     supabasePublishableKey,
     {
+      global: {
+        fetch: serverFetch,
+      },
+
       cookies: {
         getAll() {
           return request.cookies.getAll();

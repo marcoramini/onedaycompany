@@ -1,3 +1,5 @@
+//file: app/auth/signout/route.ts
+
 import { revalidatePath } from "next/cache";
 import {
   type NextRequest,
