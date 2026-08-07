@@ -50,27 +50,36 @@ export default function ConsoleNavigation({
       ],
     },
     {
-      label: "Foundation",
+      label: "Your company",
       items: [
         {
           label: "Identity",
           icon: "identity",
         },
         {
-          label: "Offer",
+          label: "Mission & vision",
           icon: "offer",
         },
         {
-          label: "Customers",
-          icon: "customers",
+          label: "Problem & solution",
+          icon: "strategy",
         },
         {
           label: "Strategy",
           icon: "strategy",
         },
+      ],
+    },
+    {
+      label: "Customers",
+      items: [
         {
-          label: "Brand",
-          icon: "brand",
+          label: "Customer profiles",
+          icon: "customers",
+        },
+        {
+          label: "Contacts",
+          icon: "account",
         },
       ],
     },

@@ -13,14 +13,29 @@ The format is intentionally lightweight.
 - Guided proposal refinement with quick suggestions and free-text direction.
 - Dedicated company creation loading with rotating progress messages.
 - Structured Execution Plan generation after the user chooses a company.
-- Execution Plan contract with three to five ordered, actionable steps.
+- Execution Plan contract with seven ordered, capability-bound steps.
 - Workflow-type routing metadata for each execution step.
+- Structured activities with completion criteria inside every execution step.
+- Persistent Execution Plans, steps, and activities attached to saved companies.
+- Workspace current-activity card and progress timeline driven by persisted execution state.
+- Canonical seven-capability company model and capability-centered Workspace cards.
+- Deterministic launch-readiness summary with Public Presence as the initial visual focus.
+- Momentum-first current activity and progress ordering for both new and persisted plans.
+- Current activity and company progress moved beside the capability cards below Launch Readiness.
+- Execution Plan generation constrained to one implementation step for each universal capability.
 - Dedicated `ExecutionPlanScreen`.
 - Dedicated `ExecutionPlanLoading` transition.
 - Deterministic fallback generation for both companies and execution plans.
 - Shared OpenAI client with optional `HTTP_PROXY` or `HTTPS_PROXY` support.
 - Strict JSON Schema and Zod validation for AI-generated application data.
 - Generation source metadata: `ai` or `fallback`.
+- Authenticated multi-company Workspace with permanent company deletion.
+- Capability task board with expandable persisted activities and completion criteria.
+- Per-step percentage bars in `Your progress`.
+- Compact logo actions in the company header.
+- Contextual `Refine step` and `Refine activity` entry points.
+- Impact-aware refinement side-panel prototype with explicit-acceptance guardrail.
+- Corrective legacy capability migration with plan-level capability uniqueness.
 
 ### Changed
 
@@ -47,6 +62,10 @@ The format is intentionally lightweight.
 - Returning from the current Architect now restores the Execution Plan.
 - Regenerating or refining a company invalidates its previous Execution Plan.
 - Kept proxy configuration environment-specific so Vercel connects directly.
+- Replaced the linear current-activity presentation with user-selectable task cards.
+- Replaced large card actions with compact text links.
+- Applied momentum-first presentation without rewriting persisted plans.
+- Required AI refinements to remain proposals until explicit `Accept changes`.
 
 ### Security
 

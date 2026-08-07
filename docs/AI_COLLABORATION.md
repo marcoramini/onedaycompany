@@ -21,10 +21,13 @@ The repository is more authoritative than memory.
 At the beginning of a new chat, provide:
 
 1. `PROJECT_BRIEF.md`;
-2. `CHAT_HANDOFF.md`;
-3. relevant code files or a Git diff;
-4. the exact objective for the session;
-5. any error output.
+2. `DECISIONS.md`;
+3. `CHAT_HANDOFF.md`;
+4. `ROADMAP.md`;
+5. the relevant section of `ARCHITECTURE.md`;
+6. relevant code files or a Git diff;
+7. the exact objective for the session;
+8. any error output.
 
 Do not paste the entire repository unless required.
 
@@ -33,7 +36,7 @@ Do not paste the entire repository unless required.
 ```text
 Continuiamo OneDayCompany.
 
-Leggi prima PROJECT_BRIEF.md e CHAT_HANDOFF.md.
+Leggi PROJECT_BRIEF.md, DECISIONS.md, CHAT_HANDOFF.md, ROADMAP.md e ARCHITECTURE.md.
 Considera il codice allegato come stato corrente del repository.
 
 Obiettivo di questa sessione:
@@ -71,7 +74,7 @@ For every change:
 3. agree on the smallest useful implementation;
 4. write or modify code;
 5. run the application;
-6. run `npm run build`;
+6. run `npm run lint` and `npm run build`;
 7. commit;
 8. update documentation if a durable decision changed.
 

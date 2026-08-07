@@ -5,6 +5,11 @@ import { z } from "zod";
 import {
   companySchema,
 } from "./businessOpportunitiesSchema";
+import { companyCapabilityIds } from "../types/companyCapability";
+
+export const companyCapabilityIdSchema = z.enum(
+  companyCapabilityIds,
+);
 
 export const executionWorkflowTypeSchema = z.enum([
   "offer-builder",
@@ -25,7 +30,25 @@ export const executionStepStatusSchema = z.enum([
   "skipped",
 ]);
 
+export const generatedExecutionActivitySchema = z.object({
+  title: z.string().trim().min(1).max(100),
+
+  description: z
+    .string()
+    .trim()
+    .min(1)
+    .max(240),
+
+  completionCriterion: z
+    .string()
+    .trim()
+    .min(1)
+    .max(180),
+});
+
 export const generatedExecutionStepSchema = z.object({
+  capabilityId: companyCapabilityIdSchema,
+
   title: z.string().trim().min(1).max(120),
 
   reason: z.string().trim().min(1).max(300),
@@ -38,11 +61,23 @@ export const generatedExecutionStepSchema = z.object({
 
   workflowType: executionWorkflowTypeSchema,
 
+  activities: z
+    .array(generatedExecutionActivitySchema)
+    .min(2)
+    .max(5),
+
   completionCriteria: z
     .array(z.string().trim().min(1).max(180))
     .min(1)
     .max(4),
 });
+
+export const executionActivitySchema =
+  generatedExecutionActivitySchema.extend({
+    id: z.string().uuid(),
+    order: z.number().int().positive(),
+    status: executionStepStatusSchema,
+  });
 
 export const generatedExecutionPlanSchema = z.object({
   introduction: z
@@ -53,12 +88,31 @@ export const generatedExecutionPlanSchema = z.object({
 
   steps: z
     .array(generatedExecutionStepSchema)
-    .min(3)
-    .max(5),
+    .length(companyCapabilityIds.length),
+}).superRefine((plan, context) => {
+  const generatedCapabilityIds = new Set(
+    plan.steps.map((step) => step.capabilityId),
+  );
+
+  for (const capabilityId of companyCapabilityIds) {
+    if (!generatedCapabilityIds.has(capabilityId)) {
+      context.addIssue({
+        code: "custom",
+        path: ["steps"],
+        message: `Missing capability: ${capabilityId}`,
+      });
+    }
+  }
 });
 
 export const executionStepSchema =
-  generatedExecutionStepSchema.extend({
+  generatedExecutionStepSchema.omit({
+    activities: true,
+  }).extend({
+    activities: z
+      .array(executionActivitySchema)
+      .min(2)
+      .max(5),
     id: z.string().uuid(),
     order: z.number().int().positive(),
     status: executionStepStatusSchema,
@@ -73,7 +127,10 @@ export const companyExecutionPlanSchema = z.object({
     .trim()
     .min(1)
     .max(400),
-  steps: z.array(executionStepSchema).min(3).max(5),
+  steps: z
+    .array(executionStepSchema)
+    .min(3)
+    .max(companyCapabilityIds.length),
   version: z.number().int().positive(),
   source: z.enum(["ai", "fallback"]),
   createdAt: z.string().datetime(),
@@ -96,6 +153,14 @@ export type ExecutionWorkflowType = z.infer<
 
 export type ExecutionStepStatus = z.infer<
   typeof executionStepStatusSchema
+>;
+
+export type GeneratedExecutionActivity = z.infer<
+  typeof generatedExecutionActivitySchema
+>;
+
+export type ExecutionActivity = z.infer<
+  typeof executionActivitySchema
 >;
 
 export type GeneratedExecutionStep = z.infer<

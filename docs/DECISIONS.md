@@ -295,9 +295,9 @@ Proxy configuration, credentials and `.env.local` must never be committed.
 
 ## DEC-028 — The Execution Plan is operational navigation
 
-**Status:** Accepted
+**Status:** Revised and accepted
 
-After the user chooses a company, OneDayCompany generates between three and five ordered execution steps.
+After the user chooses a company, OneDayCompany generates one ordered implementation step for each of the seven universal company capabilities.
 
 The Execution Plan is not a static checklist, strategic document or business plan. It is the operational navigation of the active company.
 
@@ -311,11 +311,13 @@ Each step must:
 - move the company toward launch, customers or revenue;
 - connect to a focused workflow type.
 
+The application defines the capability set and validates complete coverage. AI adapts the implementation, activities and appropriate workflow for each capability; it cannot omit, merge or invent capabilities.
+
 ---
 
 ## DEC-029 — AI plans; the application owns execution state
 
-**Status:** Accepted
+**Status:** Revised and accepted
 
 For Execution Plans, AI generates only:
 
@@ -324,6 +326,7 @@ For Execution Plans, AI generates only:
 - reason;
 - expected outcome;
 - workflow type;
+- ordered activity titles, descriptions and completion criteria;
 - completion criteria.
 
 The application owns:
@@ -338,6 +341,10 @@ The application owns:
 
 AI must not regenerate or overwrite application-managed execution state.
 
+Each execution step contains between two and five practical activities.
+AI defines the activity content, while the application assigns activity
+identifiers, ordering and status.
+
 ---
 
 ## DEC-030 — Focused workflows, not generic chat
@@ -349,3 +356,100 @@ Each Execution Plan step opens a workflow dedicated to one objective.
 Workflow types are a controlled application capability set. The model may select a supported workflow type, but the application validates and routes it.
 
 `custom-guided-step` may support valid actions without a dedicated builder, but it must still use a structured, goal-oriented flow and must not become a generic chatbot.
+
+---
+
+## DEC-031 — Universal company capabilities
+
+**Status:** Accepted
+
+Every OneDayCompany workspace begins from seven application-defined capabilities:
+
+1. company foundation;
+2. first customers;
+3. first offer;
+4. brand identity;
+5. public presence;
+6. promotional launch;
+7. customer operations.
+
+The application defines which capabilities every company needs. AI adapts how each capability is implemented for the specific company; it does not remove universal capabilities.
+
+The Workspace presents durable capability cards rather than treating the company as only a linear checklist. Activities and execution steps remain the operational state behind each capability.
+
+Public presence is the first visually emphasized launch capability because a clear public page and contact action make the company feel real and reachable. Its implementation may vary, including contact, booking, catalog, portfolio, waitlist, or another company-specific format.
+
+Launch readiness is calculated from explicit required activities owned by the application. AI must not invent progress percentages.
+
+---
+
+## DEC-032 — Momentum-first execution order
+
+**Status:** Accepted
+
+The Workspace presents the next useful work in a momentum-first order that is
+owned by the application and remains separate from AI-generated step order.
+
+The initial priority is:
+
+1. first offer;
+2. brand identity;
+3. public presence;
+4. promotional launch;
+5. customer operations;
+6. first customers;
+7. company foundation or external launch requirements still outstanding.
+
+The first suggested work should be autonomous, creative, low-cost and capable
+of producing a visible result. Permits, venue approvals, partner responses and
+other external dependencies are introduced only when relevant and at the
+latest responsible moment before the action they block.
+
+Existing persisted plans are not silently regenerated or overwritten. The
+application may reorder their presentation while preserving their content and
+execution state.
+
+---
+
+## DEC-033 — Explicit acceptance for AI refinements
+
+**Status:** Accepted
+
+AI-assisted refinement of a company step or activity produces a structured
+change proposal. It never writes directly to company, capability, execution,
+or published-output state.
+
+Before applying a proposal, the application must show the requested change,
+its affected company elements, completed work that needs review, and any
+lower-impact alternative identified by the model. Cascading changes are
+applied only after the user explicitly selects `Accept changes`.
+
+Published or completed outputs are not silently overwritten. When affected,
+they become explicit review items in the proposed change set.
+
+---
+
+## DEC-034 — Company Workspace Home v1 baseline
+
+**Status:** Accepted
+
+The Company Workspace home is a capability task board rather than a linear
+wizard or a generic assistant conversation.
+
+The accepted baseline includes:
+
+- one task card for every visible operational step;
+- user-selectable activities with one expanded card at a time;
+- per-step completion percentages in both cards and `Your progress`;
+- Launch Readiness with a non-blocking recommended next action;
+- Foundation information kept separate from operational progress;
+- contextual refinement entry points on steps and activities;
+- compact logo actions in the company header.
+
+The visual `brand-identity` card is hidden because logo actions currently live
+in the header. This does not remove the canonical capability from the domain,
+schema, prompt or persisted plans. Removing or merging that capability requires
+a separate explicit revision of DEC-031.
+
+Dedicated implementations for offer, public presence, logo, promotion,
+customer operations and refinement must proceed as separate focused milestones.

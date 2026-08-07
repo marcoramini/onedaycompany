@@ -22,11 +22,25 @@ const EXECUTION_PLAN_JSON_SCHEMA = {
     },
     steps: {
       type: "array",
-      minItems: 3,
-      maxItems: 5,
+      minItems: 7,
+      maxItems: 7,
       items: {
         type: "object",
         properties: {
+          capabilityId: {
+            type: "string",
+            enum: [
+              "company-foundation",
+              "first-customers",
+              "first-offer",
+              "brand-identity",
+              "public-presence",
+              "promotional-launch",
+              "customer-operations",
+            ],
+            description:
+              "The application-defined capability this step implements.",
+          },
           title: {
             type: "string",
             minLength: 1,
@@ -62,6 +76,45 @@ const EXECUTION_PLAN_JSON_SCHEMA = {
               "custom-guided-step",
             ],
           },
+          activities: {
+            type: "array",
+            minItems: 2,
+            maxItems: 5,
+            description:
+              "The ordered practical activities needed to complete this step.",
+            items: {
+              type: "object",
+              properties: {
+                title: {
+                  type: "string",
+                  minLength: 1,
+                  maxLength: 100,
+                  description:
+                    "A concise action beginning with a verb.",
+                },
+                description: {
+                  type: "string",
+                  minLength: 1,
+                  maxLength: 240,
+                  description:
+                    "What the founder should do in this activity.",
+                },
+                completionCriterion: {
+                  type: "string",
+                  minLength: 1,
+                  maxLength: 180,
+                  description:
+                    "One observable check proving the activity is complete.",
+                },
+              },
+              required: [
+                "title",
+                "description",
+                "completionCriterion",
+              ],
+              additionalProperties: false,
+            },
+          },
           completionCriteria: {
             type: "array",
             minItems: 1,
@@ -76,10 +129,12 @@ const EXECUTION_PLAN_JSON_SCHEMA = {
           },
         },
         required: [
+          "capabilityId",
           "title",
           "reason",
           "expectedOutcome",
           "workflowType",
+          "activities",
           "completionCriteria",
         ],
         additionalProperties: false,
@@ -108,7 +163,7 @@ export async function generateAiExecutionPlan(
       effort: "low",
     },
 
-    max_output_tokens: 2_500,
+    max_output_tokens: 8_000,
 
     text: {
       format: {

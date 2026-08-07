@@ -114,6 +114,39 @@ export default function ExecutionPlanScreen({
                         </p>
                       </div>
 
+                      <div className="mt-5">
+                        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-black/45">
+                          Activities to complete
+                        </p>
+
+                        <ol className="mt-3 space-y-3">
+                          {step.activities.map(
+                            (activity) => (
+                              <li
+                                key={activity.id}
+                                className="grid grid-cols-[1.75rem_minmax(0,1fr)] gap-3"
+                              >
+                                <span className="flex h-7 w-7 items-center justify-center rounded-full border border-black/10 bg-white text-xs font-semibold text-black/50">
+                                  {activity.order}
+                                </span>
+
+                                <div>
+                                  <h3 className="text-sm font-semibold text-black/80">
+                                    {activity.title}
+                                  </h3>
+                                  <p className="mt-1 text-sm leading-6 text-black/55">
+                                    {activity.description}
+                                  </p>
+                                  <p className="mt-1.5 text-xs leading-5 text-emerald-700">
+                                    Done when: {activity.completionCriterion}
+                                  </p>
+                                </div>
+                              </li>
+                            ),
+                          )}
+                        </ol>
+                      </div>
+
                       {isFirst ? (
                         <button
                           type="button"

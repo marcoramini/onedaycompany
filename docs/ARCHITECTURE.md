@@ -1,427 +1,238 @@
 # OneDayCompany — Architecture
 
-## 1. Architectural objective
+## Architectural objective
 
-The architecture must support a guided Entrepreneur Operating System in which:
-
-- the Product Method defines the workflow;
-- domain state preserves decisions and evidence;
-- the UI presents one objective at a time;
-- AI services assist specific stages;
-- providers remain replaceable;
-- user progress can later persist across sessions.
-
-The architecture should evolve incrementally. Avoid building infrastructure before a product milestone requires it.
-
-## 2. Current architecture
-
-OneDayCompany is currently a Next.js prototype with a client-side guided workflow and a server-side Business Opportunity generation endpoint.
-
-### Current stack
-
-- Next.js;
-- React;
-- TypeScript;
-- Tailwind CSS;
-- Next.js App Router;
-- Vercel;
-- GitHub.
-
-### Current layers
+OneDayCompany is an AI-assisted Entrepreneur Operating System. The product
+method and durable application state control the experience; AI assists
+bounded stages and never becomes the source of truth.
 
 ```text
 Presentation
-├── Landing
-├── SkillsForm
-├── BusinessDirectionScreen
-├── Architect
-├── ResultCard
-└── ArchitectStep
-
-Application orchestration
-└── src/app/page.tsx
-
-Domain types
-└── src/app/types/business.ts
-
-Application service
-└── app/lib/businessOpportunityService.ts
-
-Server API
-└── app/api/business-opportunities/route.ts
-
-AI adapter and validation
-├── app/lib/aiBusinessOpportunityGenerator.ts
-├── app/lib/businessOpportunitySchema.ts
-└── app/lib/fallbackBusinessGenerator.ts
+  ↓
+Focused workflows
+  ↓
+Product method and domain contracts
+  ↓
+Application services
+  ↓
+AI adapters and persistence
 ```
 
-### Current product flow
+## Current stack
+
+- Next.js 16 App Router;
+- React 19 and TypeScript;
+- Tailwind CSS;
+- Supabase authentication, PostgreSQL and Row Level Security;
+- OpenAI Responses API with strict structured output;
+- Zod validation;
+- Vercel deployment;
+- optional local `HTTP_PROXY` / `HTTPS_PROXY` support.
+
+Relevant Next.js documentation in `node_modules/next/dist/docs` must be read
+before changing framework-specific code.
+
+## Current runtime flow
 
 ```text
-Landing
+Public landing
   ↓
-Skills
-  ↓
-Business Opportunities
-  ↓
-The Architect
-```
-
-Business Opportunity generation now follows this runtime path:
-
-```text
-Browser UI
-  ↓
-businessOpportunityService
+Client-guided Company Beginning
   ↓
 POST /api/business-opportunities
   ↓
-OpenAI Responses API + strict structured output
+Validated Company proposal
+  ↓
+Authentication
+  ↓
+POST /api/companies
+  ├── persist Company and Offer
+  └── generate and persist Execution Plan
+  ↓
+Server-rendered /console/[companyId]
+  ↓
+Client task-board interactions
+```
+
+## Company generation
+
+```text
+UI → businessOpportunitiesService
+   → POST /api/business-opportunities
+   → OpenAI adapter or deterministic fallback
+   → strict JSON Schema
+   → Zod Company contract
+```
+
+Company proposal refinement receives the existing proposal and preserves
+unaffected strengths.
+
+## Company persistence and ownership
+
+Supabase owns durable authentication and company data. The server verifies the
+authenticated user and company ownership for every private operation.
+
+Current durable entities:
+
+```text
+profiles
+companies
+  ├── offers
+  └── execution_plans
+        └── execution_steps
+              └── execution_activities
+```
+
+Foreign-key cascades support permanent company deletion. RLS prevents access
+to another user's company state.
+
+The selected Company is temporarily held only until authentication and initial
+persistence complete. Once saved, database state is authoritative.
+
+## Execution Plan
+
+The application defines seven canonical capabilities. AI generates one
+company-specific step per capability and two to five practical activities per
+step.
+
+AI owns generated content:
+
+- plan introduction;
+- step title, reason, expected outcome and workflow type;
+- activity title, description and completion criterion;
+- step completion criteria.
+
+The application owns:
+
+- capability set;
+- identifiers and database relationships;
+- execution ordering and momentum presentation ordering;
+- status and timestamps;
+- version and generation source;
+- output references;
+- progress calculation.
+
+Existing persisted plans are never silently regenerated. Migration 005 maps
+previous steps to capability identifiers without rewriting their content.
+
+## Company Workspace composition
+
+`app/console/[companyId]/page.tsx` is a Server Component. It authenticates,
+loads owned data and composes the Workspace.
+
+```text
+ConsoleShell
+├── ConsoleSidebar / ConsoleMobileHeader
+└── Company Workspace
+    ├── CompanyConsoleHeader
+    └── CompanyCapabilities
+        ├── LaunchProgress
+        ├── CompanyTaskBoard (client boundary)
+        ├── CompanyOverview (server-rendered slot)
+        └── CompanyJourney (server-rendered slot)
+```
+
+`CompanyTaskBoard` is the narrow client boundary responsible for card
+expansion and the refinement-panel prototype. Data fetching and secrets remain
+server-side.
+
+The task board hides `brand-identity` from its card list because logo actions
+currently live in the header. The canonical capability is intentionally still
+preserved in schemas and persisted plans.
+
+## Momentum-first navigation
+
+Canonical capability identity is separate from presentation priority.
+`app/lib/companyMomentum.ts` chooses the next unfinished work in this order:
+
+```text
+First offer → Brand identity → Public presence → Promotion
+→ Customer operations → First customers → Company foundation
+```
+
+This prevents old or newly generated bureaucratic requirements from becoming
+the first emotional experience. External dependencies remain visible when
+relevant but are deferred to the latest responsible moment.
+
+## AI-assisted refinement target architecture
+
+The current side panel is presentation only. The target boundary is:
+
+```text
+Focused refinement request
+  ↓
+Server-side company context assembly
+  ↓
+LLM structured proposal
   ↓
 Zod validation
   ↓
-three BusinessDirection objects
+Application impact analysis
+  ↓
+User-visible diff and lower-impact alternative
+  ↓
+Explicit Accept changes
+  ↓
+Transactional write + version + needs_review markers
 ```
 
-If the provider call fails or the output is invalid, the route validates and returns the deterministic fallback generator output.
+The LLM never applies the proposal. Application code validates dependencies
+and owns the transaction. Completed or published outputs cannot be silently
+overwritten.
 
-## 3. Target conceptual architecture
+## Network and secrets
 
 ```text
-Presentation Layer
-  ↓
-Workflow Layer
-  ↓
-Product Method / Domain Layer
-  ↓
-Application Services
-  ↓
-AI and External Service Adapters
-  ↓
-Infrastructure and Persistence
+Local development
+Next.js → optional HTTP(S) proxy → corporate network → providers
+
+Vercel
+Next.js → direct HTTPS → providers
 ```
-
-### Presentation Layer
-
-Responsible for:
-
-- one-screen-one-objective experiences;
-- rendering domain state;
-- collecting user input and decisions;
-- showing progress, errors and recoverable actions;
-- emitting user intent through typed callbacks or actions.
-
-It should not contain generation rules, provider calls or persistence logic.
-
-### Workflow Layer
-
-Responsible for:
-
-- the current stage;
-- valid transitions;
-- stage completion criteria;
-- navigation history;
-- orchestration of asynchronous work;
-- selecting the next user objective.
-
-The workflow layer should prevent invalid combinations of state.
-
-### Product Method / Domain Layer
-
-Responsible for:
-
-- domain entities and value objects;
-- business hypotheses;
-- user decisions;
-- validation evidence;
-- stage outputs;
-- rules that do not depend on UI or providers.
-
-The domain model should distinguish assumptions from evidence.
-
-### Application Services
-
-Responsible for use cases such as:
-
-- generate business directions;
-- create a Business Blueprint;
-- create a validation plan;
-- record evidence;
-- recommend continue, refine or change;
-- prepare an offer or outreach asset.
-
-Application services coordinate domain logic and adapters.
-
-### AI and External Service Adapters
-
-Responsible for:
-
-- provider-specific API calls;
-- model configuration;
-- structured output requests;
-- external research or enrichment;
-- translating provider responses into domain contracts.
-
-Provider responses must not be passed directly to UI components without validation.
-
-### Infrastructure and Persistence
-
-Responsible for:
-
-- database access;
-- authentication;
-- telemetry;
-- logs and monitoring;
-- durable storage;
-- billing integration;
-- external queues or jobs when later required.
-
-## 4. Near-term target flow
-
-For the first AI-backed Blueprint:
-
-```text
-Browser
-  ↓
-Next.js UI
-  ↓
-Workflow action
-  ↓
-Server Action or API Route
-  ↓
-Blueprint application service
-  ↓
-AI provider adapter
-  ↓
-Schema validation
-  ↓
-BusinessBlueprint domain object
-  ↓
-UI
-```
-
-
-## 4.1 Environment-specific network path
-
-Corporate local development and Vercel use different network paths without changing application behavior.
-
-```text
-Local corporate development
-Next.js server → LOCAL_PROXY_URL → CNTLM/local bridge → NTLM corporate proxy → OpenAI
-
-Vercel Preview / Production
-Next.js server → direct HTTPS → OpenAI
-```
-
-`LOCAL_PROXY_URL` is optional. Its presence enables the local HTTP proxy agent; its absence selects direct connectivity. The application does not store NTLM domain, username or password.
-
-## 5. Recommended project structure
-
-This is a direction, not a required immediate refactor.
-
-```text
-src/
-├── app/
-│   ├── api/
-│   │   └── blueprint/
-│   │       └── route.ts
-│   ├── components/
-│   ├── page.tsx
-│   └── ...
-├── domain/
-│   ├── skills.ts
-│   ├── businessDirection.ts
-│   ├── blueprint.ts
-│   ├── validation.ts
-│   ├── evidence.ts
-│   └── workflow.ts
-├── services/
-│   ├── businessDirectionService.ts
-│   ├── blueprintService.ts
-│   └── validationService.ts
-├── providers/
-│   └── ai/
-│       ├── aiProvider.ts
-│       └── openAIProvider.ts
-├── prompts/
-│   ├── businessDirection/
-│   └── blueprint/
-└── infrastructure/
-    ├── persistence/
-    └── telemetry/
-```
-
-Do not adopt this entire structure until the codebase needs it. Prefer the smallest coherent change that preserves clear responsibilities.
-
-## 6. Workflow state
-
-The current collection of independent React state variables is temporary.
-
-Before adding the Blueprint and later stages, introduce an explicit workflow state.
-
-Initial form:
-
-```ts
-export type WorkflowStep =
-  | "landing"
-  | "skills"
-  | "direction"
-  | "architect"
-  | "blueprint";
-```
-
-Preferred domain-safe evolution:
-
-```ts
-type WorkflowState =
-  | { step: "landing" }
-  | { step: "skills"; skillsDraft: string }
-  | {
-      step: "direction";
-      skillProfile: SkillProfile;
-      directions: BusinessDirection[];
-    }
-  | {
-      step: "architect";
-      skillProfile: SkillProfile;
-      direction: BusinessDirection;
-    }
-  | {
-      step: "blueprint";
-      skillProfile: SkillProfile;
-      direction: BusinessDirection;
-      blueprint: BusinessBlueprint;
-    };
-```
-
-The discriminated union prevents invalid state combinations and makes each stage’s required context explicit.
-
-## 7. Domain data principles
-
-Domain objects should:
-
-- use explicit TypeScript types;
-- represent one stage output clearly;
-- distinguish user input, generated hypotheses and evidence;
-- include stable identifiers when persistence is introduced;
-- preserve user edits;
-- avoid provider-specific fields;
-- remain concise enough for the product workflow.
-
-The Business Blueprint should be a living hypothesis, not a single unstructured text field.
-
-## 8. AI integration rules
-
-When AI is introduced:
-
-1. API keys must never be exposed to the browser.
-2. AI calls must occur server-side.
-3. Requests should be stage-specific.
-4. Responses must use structured output when available.
-5. Every response must be validated before entering domain state.
-6. Provider-specific code must be isolated.
-7. Domain contracts must not depend on one provider.
-8. Prompts must be versioned.
-9. Model and prompt version should be traceable.
-10. Latency, failure category and approximate cost should be measurable.
-11. Errors must be recoverable without losing user work.
-12. AI output must distinguish hypotheses from evidence.
-
-See `AI_METHOD.md` for product behavior and AI standards.
-
-## 9. Persistence strategy
-
-No database is required for the current prototype milestone.
-
-Introduce persistence when one or more of these become necessary:
-
-- users must resume a workflow;
-- users can maintain multiple businesses;
-- Blueprints and user edits must be durable;
-- evidence accumulates across customer conversations;
-- user authentication is introduced;
-- analytics require durable event history;
-- billing or usage limits are introduced.
-
-When persistence is added, store domain state rather than relying on chat transcripts as the source of truth.
-
-## 10. Analytics and telemetry
-
-Product analytics should be aligned with the Product Method.
-
-Useful events include:
-
-- stage started;
-- stage completed;
-- direction selected;
-- hypothesis edited;
-- validation action created;
-- outreach initiated;
-- evidence recorded;
-- first customer recorded;
-- first revenue recorded;
-- recommendation accepted or rejected;
-- generation failed or retried.
-
-Do not collect unnecessary personal or sensitive data.
-
-## 11. Error handling
-
-Every asynchronous stage should define:
-
-- loading state;
-- timeout behavior;
-- validation failure behavior;
-- retry action;
-- safe fallback;
-- preservation of previous user work;
-- user-facing explanation in plain English.
-
-The Architect may represent a real generation phase later, but it must not become an artificial delay without product value.
-
-## 12. Security and privacy principles
 
 - Secrets remain server-side.
-- Validate all external input and generated output.
-- Minimize stored personal data.
-- Do not expose internal prompts or credentials through errors.
-- Add authentication before private durable projects are introduced.
-- Add data export and deletion with persistent accounts.
-- Review privacy, terms and analytics before commercial launch.
+- `.env`, `.env.local` and proxy credentials are never committed.
+- Shared clients remain the single provider connection layer.
+- Local proxy configuration must not be copied to Vercel.
 
-## 13. Quality gates
+## Database migrations
+
+```text
+001_auth_and_company_foundation.sql
+002_idempotent_company_creation.sql
+003_company_last_opened.sql
+004_execution_plan_persistence.sql
+005_execution_step_capabilities.sql
+006_correct_legacy_step_capabilities.sql
+```
+
+Migration 006 corrects seven-step legacy plans whose generic workflow types
+were ambiguously mapped by migration 005.
+
+Database migrations are not automatically applied by the application. Apply
+them deliberately to each Supabase environment.
+
+## Quality gates
 
 Before every push:
 
 ```bash
-npm run build
-```
-
-When available, also run:
-
-```bash
 npm run lint
-npm test
+npm run build
+git diff --check
 ```
 
-A product change is complete only when:
+A milestone is complete only when public copy remains English, responsive
+behavior is coherent, errors preserve user work, relevant documentation is
+updated and deployment is verified.
 
-- TypeScript compiles;
-- the intended workflow works;
-- invalid transitions are prevented;
-- mobile layout is checked;
-- user-visible copy is in English;
-- errors are recoverable where relevant;
-- relevant documentation is updated;
-- production deployment succeeds.
+## Guardrails
 
-## 14. Architectural guardrails
-
-- Do not build a generic chat architecture.
-- Do not let raw AI output define domain state.
-- Do not introduce a database before persistence is required.
-- Do not create broad provider abstractions without a concrete need.
-- Do not move business rules into presentation components.
-- Do not add features outside the current milestone without identifying the trade-off.
-- Do not silently revise accepted decisions in `DECISIONS.md`.
+- Repository code is the first source of truth.
+- Do not build a generic chatbot.
+- One screen should retain one primary objective.
+- Do not pass raw provider output into domain state.
+- Do not let AI own IDs, progress, statuses or writes.
+- Do not overwrite completed or published work silently.
+- Do not broaden a focused workflow into a general agent system.
+- Do not revise accepted decisions without updating `DECISIONS.md`.

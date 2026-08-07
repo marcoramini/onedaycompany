@@ -6,6 +6,7 @@ import {
 import {
   createCompanyWithOffer,
 } from "./companyRepository";
+import { ensureCompanyExecutionPlan } from "./companyExecutionPlanRepository";
 import { createClient } from "../../lib/supabase/server";
 
 export async function POST(request: Request) {
@@ -73,6 +74,13 @@ export async function POST(request: Request) {
           payload: validationResult.data,
         },
       );
+
+    await ensureCompanyExecutionPlan(
+      supabase,
+      company.id,
+      validationResult.data.company,
+      validationResult.data.beginningContext,
+    );
 
     return NextResponse.json(
       {

@@ -7,6 +7,8 @@ import {
 } from "next/navigation";
 
 import CompanyConsoleHeader from "../../components/console/CompanyConsoleHeader";
+import CompanyCapabilities from "../../components/console/CompanyCapabilities";
+import CompanyJourney from "../../components/console/CompanyJourney";
 import CompanyOverview from "../../components/console/CompanyOverview";
 import CompanySwitcher from "../../components/console/CompanySwitcher";
 import ConsoleMobileHeader from "../../components/console/ConsoleMobileHeader";
@@ -14,10 +16,12 @@ import ConsoleShell from "../../components/console/ConsoleShell";
 import ConsoleSidebar from "../../components/console/ConsoleSidebar";
 import ConsoleUserArea from "../../components/console/ConsoleUserArea";
 import OpenedCompanyTracker from "../../components/console/OpenedCompanyTracker";
-import { getUserCompanies } from "../../lib/companies/companyQueries";
+import {
+  getCompanyExecutionPlan,
+  getUserCompanies,
+} from "../../lib/companies/companyQueries";
+import { getMomentumCurrentStep } from "../../lib/companyMomentum";
 import { createClient } from "../../lib/supabase/server";
-
-import CompanyJourney from "../../components/console/CompanyJourney";
 
 type CompanyConsolePageProps = {
   params: Promise<{
@@ -32,6 +36,7 @@ type PersistedCompany = {
   mission: string;
   problem: string;
   solution: string;
+  ideal_customers: string[];
   status: string;
   active_stage: string;
 };
@@ -70,6 +75,7 @@ export default async function CompanyConsolePage({
       mission,
       problem,
       solution,
+      ideal_customers,
       status,
       active_stage
     `)
@@ -147,8 +153,29 @@ export default async function CompanyConsolePage({
     (offer as PersistedOffer | null) ??
     null;
 
+  let executionPlan;
+
+  try {
+    executionPlan = await getCompanyExecutionPlan(
+      supabase,
+      typedCompany.id,
+    );
+  } catch (planError) {
+    console.error(
+      "Company Execution Plan loading failed.",
+      planError,
+    );
+
+    throw new Error(
+      "We couldn't load this company's path.",
+    );
+  }
+
   const userName = getUserName(user);
   const userEmail = user.email ?? null;
+  const momentumCurrentStep = executionPlan
+    ? getMomentumCurrentStep(executionPlan)
+    : undefined;
 
   const companySwitcher = (
     <CompanySwitcher
@@ -204,16 +231,38 @@ export default async function CompanyConsolePage({
           )}
         />
 
-        <CompanyJourney
-          hasCompanyFoundation
-          hasFirstOffer={Boolean(initialOffer)}
-        />
-
-        <CompanyOverview
-          mission={typedCompany.mission}
-          problem={typedCompany.problem}
-          solution={typedCompany.solution}
-          initialOffer={initialOffer}
+        <CompanyCapabilities
+          companyName={typedCompany.name}
+          offer={initialOffer}
+          customerCount={
+            typedCompany.ideal_customers.length
+          }
+          companyContext={{
+            mission: typedCompany.mission,
+            problem: typedCompany.problem,
+            solution: typedCompany.solution,
+            idealCustomers:
+              typedCompany.ideal_customers,
+          }}
+          currentFocus={momentumCurrentStep?.title}
+          plan={executionPlan}
+          foundation={
+            <CompanyOverview
+              mission={typedCompany.mission}
+              problem={typedCompany.problem}
+              solution={typedCompany.solution}
+              idealCustomers={
+                typedCompany.ideal_customers
+              }
+            />
+          }
+          journey={
+            <CompanyJourney
+              hasCompanyFoundation
+              hasFirstOffer={Boolean(initialOffer)}
+              plan={executionPlan}
+            />
+          }
         />
       </ConsoleShell>
     </>

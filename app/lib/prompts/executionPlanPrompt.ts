@@ -7,7 +7,49 @@ who wants to make a company real immediately.
 OneDayCompany is not a business-plan generator and not a generic chatbot.
 Your output becomes the operational navigation of the company.
 
-Create between 3 and 5 ordered steps.
+Create exactly 7 ordered steps, one for each universal company capability.
+Use every capability exactly once and do not invent, merge, or omit capabilities:
+
+1. company-foundation
+2. first-customers
+3. first-offer
+4. brand-identity
+5. public-presence
+6. promotional-launch
+7. customer-operations
+
+The capability list is defined by the application. Your role is to adapt
+how each capability should be implemented for this specific company.
+
+The company already has a generated starting foundation, customer
+hypotheses, and first-offer draft. For those capabilities, create practical
+confirmation and refinement activities rather than starting from nothing.
+
+Favor momentum before external dependency. The first work presented to the
+founder must be autonomous, creative, reversible, inexpensive, and capable
+of producing a visible result without waiting for another person or public
+authority. Prioritize shaping the offer, visual identity, public presence,
+promotional material, and customer-intake path.
+
+Permits, licenses, venue approval, legal checks, partner responses, and other
+external requirements may be included only when they are genuinely relevant
+to this company. Place them at the latest responsible moment before the
+specific action they block. Never make them a prerequisite for creating the
+company's initial offer, identity, page, or promotional assets.
+
+For public-presence, explicitly choose the simplest suitable first format,
+such as a contact page, booking page, lead-generation page, portfolio,
+catalog, restaurant page, waitlist, or product landing page. It must include
+one clear contact or conversion action.
+
+For brand-identity, include a first logo direction and the minimum visual
+system needed by the public presence and promotion.
+
+For promotional-launch, adapt the first campaign and assets to the company
+instead of assuming that every company should use the same social channel.
+
+For customer-operations, define the simplest practical way to handle
+contact, booking, ordering, payment, delivery, or follow-up as relevant.
 
 Every step must:
 - begin with a clear action verb;
@@ -18,6 +60,19 @@ Every step must:
 - move the company toward customers, launch, or revenue;
 - be small enough to open a focused workflow;
 - appear in the simplest sensible sequence.
+
+For every step, create between 2 and 5 ordered activities.
+Every activity must:
+- begin with a concrete action verb;
+- describe one task the founder can perform;
+- be necessary for completing the parent step;
+- avoid overlapping with the other activities;
+- have one observable completion criterion;
+- remain small enough to complete without a separate strategy phase.
+
+The activities should collectively produce the step's expected outcome.
+Step completion criteria verify the whole result; activity completion
+criteria verify the individual tasks.
 
 Prefer actions such as:
 - define a clear first offer;
@@ -92,7 +147,8 @@ Founder context:
 ${userContext.trim() || "No additional context supplied."}
 
 The introduction should make the path feel clear and achievable.
-The first step must be the most useful action to begin now.
+Keep the seven capabilities in the application-defined order.
+The application may present them in a separate momentum-first work order.
 Do not repeat the company description.
   `.trim();
 }

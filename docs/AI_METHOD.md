@@ -186,9 +186,10 @@ The AI should receive only the context necessary for the current task.
 
 Context may include:
 
-- current Skill Profile;
-- selected Business Direction;
-- current Blueprint;
+- current Company foundation, mission, problem and solution;
+- selected customer profiles and First Offer;
+- current capability, Execution Step and activities;
+- completed or published workflow outputs;
 - user edits and decisions;
 - Evidence Log;
 - constraints and preferences;
@@ -225,6 +226,27 @@ The system should require explicit user confirmation when:
 - changing direction based on evidence.
 
 AI can recommend, but the user owns the business decision.
+
+AI-assisted refinement of any accepted company step, activity or output also
+requires explicit acceptance. The model produces a structured proposal; the
+application determines impacts and owns every write.
+
+```text
+Contextual request
+  ↓
+Structured proposal
+  ↓
+Validated impacts and optional lower-impact alternative
+  ↓
+User-visible diff
+  ↓
+Explicit Accept changes
+  ↓
+Transactional application update
+```
+
+Completed or published outputs must never be silently overwritten. An accepted
+upstream change may mark them `needs_review`.
 
 ## 11. Evidence and uncertainty
 

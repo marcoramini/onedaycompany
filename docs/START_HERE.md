@@ -11,6 +11,7 @@ Use this checklist whenever starting or closing a ChatGPT development session.
    - `DECISIONS.md`
    - `CHAT_HANDOFF.md`
    - `ROADMAP.md`
+   - `ARCHITECTURE.md`
 4. Check the current repository:
    - `git status`
    - `git log --oneline -5`
@@ -48,7 +49,7 @@ Vincoli:
 5. Implement only the chosen change.
 6. Test locally.
 7. Review `git diff`.
-8. Run `npm run build` before push.
+8. Run `npm run lint` and `npm run build` before push.
 
 ## End the session
 

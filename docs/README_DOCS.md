@@ -11,6 +11,7 @@ For a new development session, read in this order:
 3. `DECISIONS.md`
 4. the relevant section of `ARCHITECTURE.md`
 5. the current milestone in `ROADMAP.md`
+6. `PRODUCT_METHOD.md` when changing capability behavior or ordering
 
 ## Files
 
@@ -37,6 +38,14 @@ Completed, current and future milestones.
 ### `CHAT_HANDOFF.md`
 
 Current operational state. Update after every substantial session.
+
+### `PRODUCT_METHOD.md`
+
+Current momentum-first entrepreneurial sequence and refinement rules.
+
+### `REPOSITORY_MAP_ENRICHED.md`
+
+Practical index of the active repository surface and current placeholders.
 
 ### `AI_COLLABORATION.md`
 

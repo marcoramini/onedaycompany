@@ -147,56 +147,70 @@ Current repository flow:
 ```text
 Landing
   ↓
-Skills form
+Guided Company Beginning
   ↓
-Three Business Opportunities
+One Company proposal
+  ├── Refine
+  └── Try another direction
   ↓
-The Architect
+Authentication and persistence
+  ↓
+Company Workspace
 ```
 
-Implemented technical foundations include:
+The Company Workspace is now the permanent operating home of a saved company.
+It includes:
 
-- Next.js, React, TypeScript and Tailwind CSS;
-- App Router and Vercel deployment;
-- server-side OpenAI Responses API integration;
-- strict structured output and Zod validation;
-- deterministic fallback generation;
-- optional local proxy support;
-- typed opportunity objects;
-- separated prompt module for Business Opportunity generation.
+- authenticated ownership and support for multiple companies;
+- permanent company deletion with explicit confirmation;
+- persisted Execution Plans, steps and activities;
+- application-defined universal company capabilities;
+- momentum-first recommendations that favor autonomous, creative work;
+- launch-readiness and per-step activity progress;
+- task cards with expandable activities and completion criteria;
+- company foundation, customer and offer context;
+- compact logo controls in the company header;
+- a visual prototype for contextual step and activity refinement.
 
-The existing Skills form and three-opportunity flow no longer represent the intended product direction and are the next area to redesign.
+The refinement prototype does not yet call the LLM or write changes. AI-assisted
+refinement must produce an impact-aware proposal and requires explicit user
+acceptance before any direct or cascading update.
 
-## 10. Current milestone
+Technical foundations include Next.js 16, React 19, TypeScript, Tailwind CSS,
+Supabase authentication and persistence, server-side OpenAI Responses API,
+strict JSON Schema and Zod validation, deterministic fallbacks and optional
+local proxy support.
 
-**Milestone: Guided Company Beginning v1**
+## 10. Completed milestone
 
-Replace the Skills form with a short, supportive interaction that:
+**Milestone: Company Workspace Home v1**
 
-- begins from what the user loves, knows, imagines or wants to create;
-- reinforces that the user already has enough to begin;
-- avoids entrepreneurial questions and evaluation language;
-- gathers only the context needed to generate one relevant company;
-- feels like the company is taking shape with every interaction;
-- produces one Business Opportunity at a time;
-- supports: `Let's build this`, `Refine this idea`, and `Try a different direction`;
-- retains previously generated opportunities for later selection.
+The graphical and information architecture of the Workspace home is accepted
+as the baseline. It makes the company feel tangible through its offer, public
+presence, promotion, customer operations and visible progress, while keeping
+the company foundation available as durable context.
 
-## 11. Success criteria for the current milestone
+The baseline deliberately separates presentation from future implementation:
 
-The milestone is complete when:
+- card actions can reveal persisted activities;
+- logo generation, upload and editing are placeholders;
+- dedicated workflows for each task remain to be implemented;
+- contextual refinement is a UI shell pending a structured proposal contract;
+- progress is partly static until workflow completion writes real state.
 
-1. the Skills form is replaced by the new guided beginning;
-2. the interaction does not feel like an interview;
-3. public copy is encouraging, immediate and written in English;
-4. the user can start without a clear business idea;
-5. exactly one opportunity is generated at a time;
-6. the user can continue, refine or request a different direction;
-7. generated opportunities remain accessible;
-8. existing server-side validation and resilience are preserved or deliberately migrated;
-9. responsive behavior is verified;
-10. `npm run build` succeeds before push;
-11. documentation is updated.
+## 11. Next implementation strategy
+
+Continue in separate, focused sessions. Each session should implement one
+capability or one shared infrastructure boundary, beginning with one of:
+
+1. structured AI refinement proposal and impact analysis;
+2. first-offer workflow;
+3. public-presence and landing-page workflow;
+4. logo generation/upload workflow;
+5. promotion workflow;
+6. real activity completion and progress updates.
+
+Do not implement several card workflows in one milestone.
 
 ## 12. Source of truth
 

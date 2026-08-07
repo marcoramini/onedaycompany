@@ -1,269 +1,125 @@
-//file: app/components/console/CompanyJourney.tsx
+import { getMomentumSteps } from "../../lib/companyMomentum";
+import type {
+  CompanyExecutionPlan,
+  ExecutionStep,
+} from "../../lib/executionPlanSchema";
 
 type CompanyJourneyProps = {
   hasCompanyFoundation: boolean;
   hasFirstOffer: boolean;
-};
-
-type JourneyStep = {
-  title: string;
-  description: string;
-  status: "completed" | "current" | "upcoming";
+  plan: CompanyExecutionPlan | null;
 };
 
 export default function CompanyJourney({
   hasCompanyFoundation,
   hasFirstOffer,
+  plan,
 }: CompanyJourneyProps) {
-  const steps: JourneyStep[] = [
-    {
-      title: "Company direction chosen",
-      description:
-        "Your company identity and starting direction are saved.",
-      status: hasCompanyFoundation
-        ? "completed"
-        : "current",
-    },
-    {
-      title: "First offer created",
-      description:
-        "Your first offer gives the company something concrete to bring to customers.",
-      status: hasFirstOffer
-        ? "completed"
-        : hasCompanyFoundation
-          ? "current"
-          : "upcoming",
-    },
-    {
-      title: "Shape your first offer",
-      description:
-        "Clarify what the customer receives, how it is delivered and why it matters.",
-      status: hasFirstOffer
-        ? "current"
-        : "upcoming",
-    },
-    {
-      title: "Define your first customers",
-      description:
-        "Identify the people most likely to benefit from what you are building.",
-      status: "upcoming",
-    },
-    {
-      title: "Establish your brand",
-      description:
-        "Create a clear identity that makes the company recognizable and credible.",
-      status: "upcoming",
-    },
-    {
-      title: "Publish your website",
-      description:
-        "Give the company a public place where people can understand the offer and respond.",
-      status: "upcoming",
-    },
-    {
-      title: "Reach your first customer",
-      description:
-        "Take the first direct action that can create a real customer conversation.",
-      status: "upcoming",
-    },
-  ];
-
-  const currentStep =
-    steps.find(
-      (step) => step.status === "current",
-    ) ?? steps[steps.length - 1];
+  const visibleSteps = plan
+    ? getMomentumSteps(plan).filter(
+        (step) => step.capabilityId !== "brand-identity",
+      )
+    : [];
 
   return (
-    <section
-      aria-labelledby="company-journey-title"
-      className="py-7 sm:py-8"
-    >
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-            Company journey
-          </p>
-
-          <h2
-            id="company-journey-title"
-            className="mt-2 text-2xl font-semibold tracking-tight text-slate-950"
-          >
-            Bring your company to life
-          </h2>
-        </div>
-
-        <p className="max-w-xl text-sm leading-6 text-slate-500 sm:text-right">
-          Follow one practical objective at a time.
+    <aside className="xl:sticky xl:top-8">
+      <section
+        aria-labelledby="company-progress-title"
+        className="rounded-[1.4rem] border border-slate-200/80 bg-white px-5 py-6 shadow-[0_12px_35px_rgba(15,23,42,0.045)]"
+      >
+        <p className="text-[0.68rem] font-bold uppercase tracking-[0.2em] text-slate-400">
+          Your progress
         </p>
-      </div>
+        <h2 id="company-progress-title" className="mt-2 text-lg font-semibold tracking-tight text-slate-950">
+          Company path
+        </h2>
 
-      <CurrentObjective
-        step={currentStep}
-      />
-
-      <div className="mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-        {steps.map((step, index) => (
-          <JourneyStepRow
-            key={step.title}
-            step={step}
-            isLast={
-              index === steps.length - 1
-            }
-          />
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function CurrentObjective({
-  step,
-}: {
-  step: JourneyStep;
-}) {
-  return (
-    <article className="mt-6 rounded-2xl border border-violet-200 bg-violet-50 px-5 py-5 sm:px-6">
-      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-700">
-        Current objective
-      </p>
-
-      <div className="mt-3 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h3 className="text-xl font-semibold tracking-tight text-slate-950">
-            {step.title}
-          </h3>
-
-          <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-            {step.description}
-          </p>
+        <div className="mt-6 space-y-5">
+          {visibleSteps.length ? (
+            visibleSteps.map((step) => (
+              <ProgressRow key={step.id} step={step} />
+            ))
+          ) : (
+            <FallbackProgress
+              hasCompanyFoundation={hasCompanyFoundation}
+              hasFirstOffer={hasFirstOffer}
+            />
+          )}
         </div>
-
-        <span className="inline-flex min-h-10 shrink-0 items-center justify-center rounded-xl bg-white px-4 text-sm font-semibold text-violet-700 shadow-sm">
-          Ready to continue
-        </span>
-      </div>
-    </article>
+      </section>
+    </aside>
   );
 }
 
-function JourneyStepRow({
-  step,
-  isLast,
-}: {
-  step: JourneyStep;
-  isLast: boolean;
-}) {
-  return (
-    <div
-      className={[
-        "grid gap-4 px-5 py-5 sm:grid-cols-[2.5rem_minmax(0,1fr)_auto] sm:items-center sm:px-6",
-        isLast
-          ? ""
-          : "border-b border-slate-100",
-      ].join(" ")}
-    >
-      <StepMarker status={step.status} />
+function ProgressRow({ step }: { step: ExecutionStep }) {
+  const completed = step.activities.filter(
+    (activity) => activity.status === "completed",
+  ).length;
+  const total = step.activities.length;
+  const percentage = total
+    ? Math.round((completed / total) * 100)
+    : 0;
 
-      <div>
-        <h3
-          className={[
-            "text-sm font-semibold",
-            step.status === "upcoming"
-              ? "text-slate-500"
-              : "text-slate-950",
-          ].join(" ")}
-        >
+  return (
+    <div>
+      <div className="flex items-start justify-between gap-3">
+        <h3 className="text-sm font-semibold leading-5 text-slate-800">
           {step.title}
         </h3>
-
-        <p className="mt-1 text-sm leading-6 text-slate-500">
-          {step.description}
-        </p>
+        <span className="shrink-0 text-xs font-semibold text-violet-700">
+          {percentage}%
+        </span>
       </div>
-
-      <StepStatus status={step.status} />
+      <div
+        className="mt-2 h-2 overflow-hidden rounded-full bg-slate-100"
+        role="progressbar"
+        aria-label={`${step.title}: ${percentage}% complete`}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={percentage}
+      >
+        <div
+          className={`h-full rounded-full ${percentage === 100 ? "bg-emerald-500" : "bg-violet-600"}`}
+          style={{ width: `${percentage}%` }}
+        />
+      </div>
+      <p className="mt-1.5 text-xs text-slate-500">
+        {completed} of {total} activities completed
+      </p>
     </div>
   );
 }
 
-function StepMarker({
-  status,
+function FallbackProgress({
+  hasCompanyFoundation,
+  hasFirstOffer,
 }: {
-  status: JourneyStep["status"];
+  hasCompanyFoundation: boolean;
+  hasFirstOffer: boolean;
 }) {
-  if (status === "completed") {
-    return (
-      <span
-        aria-hidden="true"
-        className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-100 text-emerald-700"
-      >
-        <CheckIcon />
-      </span>
-    );
-  }
-
-  if (status === "current") {
-    return (
-      <span
-        aria-hidden="true"
-        className="flex h-9 w-9 items-center justify-center rounded-full bg-violet-700 text-white"
-      >
-        <span className="h-2.5 w-2.5 rounded-full bg-white" />
-      </span>
-    );
-  }
-
   return (
-    <span
-      aria-hidden="true"
-      className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-slate-50"
-    >
-      <span className="h-2.5 w-2.5 rounded-full bg-slate-300" />
-    </span>
+    <>
+      <FallbackRow label="Company foundation" complete={hasCompanyFoundation} />
+      <FallbackRow label="First offer" complete={hasFirstOffer} />
+      <p className="text-xs leading-5 text-slate-500">
+        The detailed company path has not been saved yet.
+      </p>
+    </>
   );
 }
 
-function StepStatus({
-  status,
-}: {
-  status: JourneyStep["status"];
-}) {
-  const label =
-    status === "completed"
-      ? "Completed"
-      : status === "current"
-        ? "Current"
-        : "Upcoming";
-
+function FallbackRow({ label, complete }: { label: string; complete: boolean }) {
   return (
-    <span
-      className={[
-        "w-fit rounded-full px-3 py-1 text-xs font-semibold",
-        status === "completed"
-          ? "bg-emerald-50 text-emerald-700"
-          : status === "current"
-            ? "bg-violet-50 text-violet-700"
-            : "bg-slate-100 text-slate-500",
-      ].join(" ")}
-    >
-      {label}
-    </span>
-  );
-}
-
-function CheckIcon() {
-  return (
-    <svg
-      aria-hidden="true"
-      viewBox="0 0 24 24"
-      fill="none"
-      className="h-4 w-4"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="m5 12.5 4 4L19 7" />
-    </svg>
+    <div>
+      <div className="flex justify-between gap-3 text-sm font-semibold text-slate-800">
+        <span>{label}</span>
+        <span className="text-violet-700">{complete ? "100%" : "0%"}</span>
+      </div>
+      <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-100">
+        <div
+          className={`h-full rounded-full ${complete ? "w-full bg-emerald-500" : "w-0 bg-violet-600"}`}
+        />
+      </div>
+    </div>
   );
 }
