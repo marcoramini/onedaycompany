@@ -453,3 +453,61 @@ a separate explicit revision of DEC-031.
 
 Dedicated implementations for offer, public presence, logo, promotion,
 customer operations and refinement must proceed as separate focused milestones.
+
+---
+
+## DEC-035 — Focused tool documentation
+
+**Status:** Accepted
+
+Every substantial OneDayCompany tool has a dedicated documentation dossier
+under `docs/tools/<tool>/`. The dossier owns the tool's detailed purpose,
+boundaries, architecture, decisions and roadmap.
+
+Central project documents continue to own cross-product decisions, shared
+architecture and milestone ordering. Tool documentation refines those sources
+without silently contradicting them. A tool-changing session must read and
+update the relevant dossier in addition to the central documents it affects.
+
+---
+
+## DEC-036 — Website Agent instead of a visual page builder
+
+**Status:** Accepted
+
+OneDayCompany creates promotional sites from application-controlled templates
+and typed sections. The user requests changes through a focused Website Agent;
+the first version does not expose web-design controls or a free-form visual
+page builder.
+
+The agent may propose structured operations over site content, theme, layout,
+sections, SEO and assets. It cannot write arbitrary application code, HTML,
+CSS or JavaScript and cannot write directly to published state. Changes are
+validated, previewed and explicitly accepted before they become a publishable
+revision.
+
+OneDayCompany owns the site schema, templates, renderer, versions, publication
+and domain resolution. Visual asset creation is delegated to the shared Visual
+Asset Agent through structured requests and durable asset references.
+
+---
+
+## DEC-037 — Shared Visual Asset Agent
+
+**Status:** Accepted
+
+Visual asset generation is a separate company capability shared by focused
+tools. The Visual Asset Agent creates and evolves logos, visual identity,
+website imagery, campaign creatives and later visual assets without belonging
+to the Website Agent or Promotion Agent.
+
+Consumer tools send structured asset briefs containing company context,
+purpose, placement, format and constraints. The Visual Asset Agent owns visual
+direction, generation or composition, variants, provider interaction, asset
+metadata and durable storage. Consumer tools own placement and use of the
+selected asset in their domain.
+
+The agent remains provider-independent. A first adapter may use OpenAI, while
+other image providers can be evaluated without changing consumer contracts.
+The Website Agent milestone is paused until the initial Visual Asset Agent
+contract and asset lifecycle are defined.

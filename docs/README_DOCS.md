@@ -12,6 +12,7 @@ For a new development session, read in this order:
 4. the relevant section of `ARCHITECTURE.md`
 5. the current milestone in `ROADMAP.md`
 6. `PRODUCT_METHOD.md` when changing capability behavior or ordering
+7. the relevant tool dossier under `tools/` when working on a focused tool
 
 ## Files
 
@@ -59,6 +60,12 @@ Reusable template for planning and closing a development session.
 
 Notable changes to the project.
 
+### `tools/`
+
+Dedicated product and technical documentation for focused OneDayCompany tools.
+Each tool owns its detailed architecture, decisions and roadmap while durable
+cross-product decisions remain recorded in the central documents.
+
 ## Update frequency
 
 | File | Update when |
@@ -70,3 +77,4 @@ Notable changes to the project.
 | `ROADMAP.md` | A milestone or priority changes |
 | `CHAT_HANDOFF.md` | At the end of every substantial session |
 | `CHANGELOG.md` | A notable feature or change is completed |
+| `tools/<tool>/` | The tool contract, architecture, decisions or roadmap changes |

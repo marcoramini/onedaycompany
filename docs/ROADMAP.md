@@ -64,20 +64,37 @@ accepted change workflow.
 - [ ] Save structured outputs and update activity status.
 - [ ] Return to the Workspace with real progress.
 
-### M7 — Public-presence workflow
+### M7 — Website Agent and public-presence workflow
 
+**Status:** Paused until the initial Visual Asset Agent contract and asset
+lifecycle from M8 are defined.
+
+- [x] Accept the template-driven Website Agent direction.
+- [x] Create the dedicated Website Agent documentation dossier.
+- [ ] Define the versioned site-document and agent-operation contracts.
+- [ ] Define the initial template, section and theme catalogs.
 - [ ] Choose the suitable first page type for the company.
 - [ ] Generate structured page content and one primary CTA.
+- [ ] Request website imagery from the shared Visual Asset Agent.
 - [ ] Support contact, booking, catalog, portfolio or waitlist variants.
-- [ ] Preview and publish a minimal company page.
-- [ ] Track published state and later upgrades.
+- [ ] Preview and explicitly accept site changes.
+- [ ] Publish a minimal company page from an immutable version.
+- [ ] Add OneDayCompany subdomains and later verified custom domains.
 
-### M8 — Logo and visual asset workflow
+### M8 — Visual Asset Agent
 
-- [ ] Upload a user logo.
-- [ ] Generate logo proposals through a dedicated image provider.
-- [ ] Store the selected logo and basic visual direction.
-- [ ] Evaluate online editing integrations separately.
+**Status:** Current design priority.
+
+- [x] Separate visual production from the Website Agent.
+- [x] Create the dedicated Visual Asset Agent documentation dossier.
+- [ ] Define structured asset briefs and result contracts.
+- [ ] Define durable asset, variant and visual-direction persistence.
+- [ ] Define the image-provider adapter boundary.
+- [ ] Upload and reuse user-provided assets.
+- [ ] Create the reliable composed-logo baseline.
+- [ ] Generate optional logo symbols and promotional imagery.
+- [ ] Serve requests from Website Agent and Promotion Agent.
+- [ ] Track provider, latency, cost, rights and generation provenance.
 
 ### M9 — Promotional launch workflow
 

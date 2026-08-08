@@ -180,6 +180,53 @@ The LLM never applies the proposal. Application code validates dependencies
 and owns the transaction. Completed or published outputs cannot be silently
 overwritten.
 
+## Focused tool architecture
+
+Substantial product capabilities are documented as focused tools under
+`docs/tools/`. A tool may begin inside the current modular application and be
+extracted only when operational scale or ownership requires it. Separate
+documentation does not imply a separate deploy or microservice.
+
+The first documented tool is the Website Agent:
+
+```text
+Company context + selected site revision
+  ↓
+Focused Website Agent
+  ├── typed site operations
+  └── structured briefs → Visual Asset Agent
+  ↓
+Schema and policy validation
+  ↓
+Preview and user acceptance
+  ↓
+Immutable site version
+  ↓
+Shared public renderer
+```
+
+Templates and React components remain application-controlled. The persisted
+source of truth is a versioned site document, not model-generated source code
+or exported HTML. The first renderer lives in the OneDayCompany Next.js deploy
+and later supports path previews, OneDayCompany subdomains and verified custom
+domains without requiring user-managed hosting.
+
+## Shared Visual Asset Agent
+
+Visual production is a shared tool rather than an internal Website Agent
+module:
+
+```text
+Website Agent ───────┐
+Promotion Agent ─────┼→ Visual Asset Agent → durable company assets
+Logo workflow ───────┘
+```
+
+Consumer tools describe the business purpose and required placement. The
+Visual Asset Agent owns provider-independent generation, composition, variants,
+metadata and storage. Consumers receive stable asset references and never
+depend on temporary provider URLs or provider-specific response formats.
+
 ## Network and secrets
 
 ```text

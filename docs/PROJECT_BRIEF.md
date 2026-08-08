@@ -205,12 +205,19 @@ capability or one shared infrastructure boundary, beginning with one of:
 
 1. structured AI refinement proposal and impact analysis;
 2. first-offer workflow;
-3. public-presence and landing-page workflow;
+3. template-driven Website Agent and public-presence workflow;
 4. logo generation/upload workflow;
 5. promotion workflow;
 6. real activity completion and progress updates.
 
 Do not implement several card workflows in one milestone.
+
+The Website Agent is documented independently under
+`docs/tools/website-agent/`. It is a focused conversational workflow over
+application-controlled templates and typed site operations, not a visual page
+builder or an agent that writes arbitrary website code. Its implementation is
+paused while the shared Visual Asset Agent contract and asset lifecycle are
+defined under `docs/tools/visual-asset-agent/`.
 
 ## 12. Source of truth
 

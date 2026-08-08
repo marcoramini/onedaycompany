@@ -136,10 +136,27 @@ Open a separate task for one coherent objective:
 
 - structured refinement proposal and impact contract;
 - first-offer workflow;
-- public-presence workflow;
+- Visual Asset Agent contracts and asset lifecycle;
 - logo workflow;
 - promotion workflow;
 - activity status mutation and real progress calculation.
 
 Do not implement all workflows together. Run `npm run lint` and
 `npm run build` before every push.
+
+## Website Agent direction
+
+DEC-036 establishes a template-driven Website Agent rather than a visual page
+builder. The user requests site changes conversationally; the agent proposes
+typed operations that are validated, previewed and explicitly accepted.
+OneDayCompany owns templates, rendering, versions, assets, publication and
+domain resolution. Visual production is now delegated to the shared Visual
+Asset Agent. Website Agent implementation is paused until that shared contract
+is defined.
+
+## Visual Asset Agent direction
+
+DEC-037 separates logos, identity, website imagery and campaign creatives into
+a provider-independent shared tool. Website Agent and later Promotion Agent
+send structured asset briefs and receive durable asset references. Detailed
+work starts from `docs/tools/visual-asset-agent/README.md`.

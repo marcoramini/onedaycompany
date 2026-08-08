@@ -1,0 +1,147 @@
+schema_version: 1
+updated: 2026-08-08
+
+agents:
+  - id: company-orchestrator
+    name: Company Orchestrator
+    type: governance
+    lifecycle: definition
+    priority: immediate
+    documentation: docs/agents/company-orchestrator/README.md
+    chat_starter: docs/agents/company-orchestrator/CHAT_STARTER.md
+    owns:
+      - work decomposition and routing
+      - cross-agent dependency coordination
+      - escalation of unresolved ownership conflicts
+    must_not_own:
+      - specialist artifacts
+      - canonical company operational state
+      - documentation semantics owned by other agents
+    collaborates_with:
+      - company-state
+      - knowledge-documentation
+      - governance-quality
+      - website-agent
+      - visual-asset-agent
+
+  - id: company-state
+    name: Company State Agent
+    type: governance
+    lifecycle: definition
+    priority: immediate
+    documentation: docs/agents/company-state/README.md
+    chat_starter: docs/agents/company-state/CHAT_STARTER.md
+    owns:
+      - canonical operational-state model
+      - state transition rules
+      - state snapshots and provenance
+    must_not_own:
+      - strategic priorities
+      - specialist artifact generation
+      - publication approval
+    collaborates_with:
+      - company-orchestrator
+      - knowledge-documentation
+      - governance-quality
+      - website-agent
+      - visual-asset-agent
+
+  - id: knowledge-documentation
+    name: Knowledge & Documentation Agent
+    type: governance
+    lifecycle: definition
+    priority: immediate
+    documentation: docs/agents/knowledge-documentation/README.md
+    chat_starter: docs/agents/knowledge-documentation/CHAT_STARTER.md
+    owns:
+      - documentation taxonomy and navigation
+      - documentation consistency checks
+      - knowledge freshness and handoff completeness
+    must_not_own:
+      - semantic decisions belonging to specialist agents
+      - company strategy
+      - runtime business state
+    collaborates_with:
+      - company-orchestrator
+      - company-state
+      - governance-quality
+      - website-agent
+      - visual-asset-agent
+
+  - id: governance-quality
+    name: Governance & Quality Agent
+    type: governance
+    lifecycle: definition
+    priority: immediate
+    documentation: docs/agents/governance-quality/README.md
+    chat_starter: docs/agents/governance-quality/CHAT_STARTER.md
+    owns:
+      - agent-boundary and authority policy
+      - acceptance and audit criteria
+      - risk-based approval and escalation rules
+    must_not_own:
+      - implementation of specialist work
+      - business strategy
+      - final human approvals
+    collaborates_with:
+      - company-orchestrator
+      - company-state
+      - knowledge-documentation
+      - website-agent
+      - visual-asset-agent
+
+  - id: website-agent
+    name: Website Agent
+    type: tool
+    lifecycle: designed
+    priority: immediate
+    documentation: docs/tools/website-agent/README.md
+    chat_starter: docs/agents/README.md#website-agent
+    owns:
+      - structured site documents and revisions
+      - website preview and publication workflow
+      - placement of approved visual assets
+    must_not_own:
+      - visual asset generation and storage
+      - arbitrary application code generation
+      - publication without explicit acceptance
+    collaborates_with:
+      - company-orchestrator
+      - company-state
+      - knowledge-documentation
+      - governance-quality
+      - visual-asset-agent
+
+  - id: visual-asset-agent
+    name: Visual Asset Agent
+    type: tool
+    lifecycle: active-design
+    priority: immediate
+    documentation: docs/tools/visual-asset-agent/README.md
+    chat_starter: docs/agents/README.md#visual-asset-agent
+    owns:
+      - structured asset briefs and results
+      - visual direction, variants and asset provenance
+      - provider interaction and durable asset storage
+    must_not_own:
+      - placement in consumer outputs
+      - website or campaign publication
+      - business action requiring the asset
+    collaborates_with:
+      - company-orchestrator
+      - company-state
+      - knowledge-documentation
+      - governance-quality
+      - website-agent
+
+planned_agents:
+  - id: strategy-agent
+    trigger: Separate when strategy workload can no longer be safely owned by the Company Orchestrator.
+  - id: finance-agent
+    trigger: Add when real budgets, transactions or financial reporting require a canonical owner and human approval model.
+  - id: legal-compliance-agent
+    trigger: Add when contracts, regulated data or jurisdiction-specific obligations require a canonical owner and mandatory human review.
+  - id: promotion-agent
+    trigger: Add before implementing the promotional-launch workflow as a durable tool.
+  - id: customer-operations-agent
+    trigger: Add when contact, booking, ordering, payment or follow-up becomes a bounded product capability.

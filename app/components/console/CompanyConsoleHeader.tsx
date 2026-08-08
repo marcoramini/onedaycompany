@@ -1,15 +1,19 @@
-//file: app/components/console/CompanyConsoleHeader.tsx
+import Image from "next/image";
 
 type CompanyConsoleHeaderProps = {
   name: string;
   tagline: string;
   statusLabel: string;
+  logo?: { publicUrl: string; altText: string; reviewRequired: boolean };
+  backgroundUrl?: string;
 };
 
 export default function CompanyConsoleHeader({
   name,
   tagline,
   statusLabel,
+  logo,
+  backgroundUrl,
 }: CompanyConsoleHeaderProps) {
   return (
     <header className="relative overflow-hidden rounded-[1.75rem] border border-violet-100 bg-white shadow-[0_20px_60px_rgba(76,29,149,0.08)]">
@@ -17,6 +21,9 @@ export default function CompanyConsoleHeader({
         aria-hidden="true"
         className="absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(196,181,253,0.48),transparent_32%),radial-gradient(circle_at_88%_10%,rgba(224,231,255,0.9),transparent_32%),linear-gradient(120deg,#ffffff_18%,#faf8ff_62%,#f1f5ff)]"
       />
+      {backgroundUrl ? (
+        <Image src={backgroundUrl} alt="" fill unoptimized sizes="(min-width: 1024px) 1200px, 100vw" className="object-cover opacity-30 mix-blend-multiply" />
+      ) : null}
       <div
         aria-hidden="true"
         className="absolute -bottom-24 right-[-3rem] h-72 w-72 rounded-full border-[3rem] border-white/55"
@@ -52,11 +59,13 @@ export default function CompanyConsoleHeader({
 
         <div className="justify-self-start lg:justify-self-end">
           <div className="relative flex h-36 w-44 items-center justify-center rounded-[2rem] border border-white/80 bg-white/55 shadow-[0_24px_70px_rgba(76,29,149,0.12)] backdrop-blur-sm">
-            <span className="text-6xl font-semibold tracking-[-0.08em] text-violet-700/80">
-              {getCompanyInitials(name)}
-            </span>
+            {logo ? (
+              <Image src={logo.publicUrl} alt={logo.altText} width={112} height={112} unoptimized className="h-28 w-28 object-contain" priority />
+            ) : (
+              <span className="text-6xl font-semibold tracking-[-0.08em] text-violet-700/80">{getCompanyInitials(name)}</span>
+            )}
             <span className="absolute bottom-4 text-[0.62rem] font-bold uppercase tracking-[0.2em] text-violet-700/60">
-              Company logo
+              {logo?.reviewRequired ? "Logo draft" : "Company logo"}
             </span>
           </div>
           <div className="mt-2 flex justify-center gap-1.5">

@@ -10,6 +10,7 @@ import {
   mapCompanySwitcherItem,
   type CompanySwitcherItem,
 } from "./companySwitcher";
+import type { SelectedVisualAsset } from "../visual-asset-agent/contracts";
 
 type CompanyListRow = {
   id: string;
@@ -81,6 +82,52 @@ export async function getLastOpenedCompanyId(
   }
 
   return data?.id ?? null;
+}
+
+export async function getCompanyVisualAssets(
+  supabase: SupabaseClient,
+  companyId: string,
+): Promise<SelectedVisualAsset[]> {
+  const { data, error } = await supabase
+    .from("visual_assets")
+    .select(`
+      id,
+      purpose,
+      status,
+      review_required,
+      visual_asset_variants!inner (
+        id,
+        public_url,
+        alt_text,
+        is_selected
+      )
+    `)
+    .eq("company_id", companyId)
+    .eq("visual_asset_variants.is_selected", true);
+
+  if (error) {
+    if (error.code === "PGRST205" || error.code === "42P01") {
+      console.warn("Visual Asset Agent tables are unavailable. Apply migration 007_visual_asset_agent.sql.");
+      return [];
+    }
+    throw new Error(`Company visual assets loading failed: ${error.message}`);
+  }
+
+  return data.flatMap((asset) => {
+    const variant = asset.visual_asset_variants[0];
+    if (!variant) return [];
+    return [{
+      id: asset.id,
+      purpose: asset.purpose,
+      status: asset.status,
+      reviewRequired: asset.review_required,
+      variant: {
+        id: variant.id,
+        stableUrl: variant.public_url,
+        altText: variant.alt_text,
+      },
+    } as SelectedVisualAsset];
+  });
 }
 
 export async function getCompanyExecutionPlan(

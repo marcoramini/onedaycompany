@@ -17,6 +17,7 @@ import ConsoleSidebar from "../../components/console/ConsoleSidebar";
 import ConsoleUserArea from "../../components/console/ConsoleUserArea";
 import OpenedCompanyTracker from "../../components/console/OpenedCompanyTracker";
 import {
+  getCompanyVisualAssets,
   getCompanyExecutionPlan,
   getUserCompanies,
 } from "../../lib/companies/companyQueries";
@@ -153,6 +154,16 @@ export default async function CompanyConsolePage({
     (offer as PersistedOffer | null) ??
     null;
 
+  let visualAssets = [] as Awaited<ReturnType<typeof getCompanyVisualAssets>>;
+  try {
+    visualAssets = await getCompanyVisualAssets(supabase, typedCompany.id);
+  } catch (visualAssetError) {
+    console.error("Company visual assets loading failed.", visualAssetError);
+  }
+
+  const logo = visualAssets.find((asset) => asset.purpose === "company-logo");
+  const workspaceBackground = visualAssets.find((asset) => asset.purpose === "workspace-background");
+
   let executionPlan;
 
   try {
@@ -229,6 +240,8 @@ export default async function CompanyConsolePage({
             typedCompany.status,
             typedCompany.active_stage,
           )}
+          logo={logo ? { publicUrl: logo.variant.stableUrl, altText: logo.variant.altText, reviewRequired: logo.reviewRequired } : undefined}
+          backgroundUrl={workspaceBackground?.variant.stableUrl}
         />
 
         <CompanyCapabilities

@@ -12,6 +12,8 @@ Use this checklist whenever starting or closing a ChatGPT development session.
    - `CHAT_HANDOFF.md`
    - `ROADMAP.md`
    - `ARCHITECTURE.md`
+   - the relevant `tools/<tool>/README.md` and linked tool documents when the
+     session concerns a focused tool
 4. Check the current repository:
    - `git status`
    - `git log --oneline -5`
@@ -61,8 +63,9 @@ Vincoli:
    - `ROADMAP.md`
    - `CHANGELOG.md`
 5. Update `DECISIONS.md` and architecture documentation when needed.
-6. Commit and push coherent changes.
-7. Verify the Vercel deployment when applicable.
+6. Update the relevant tool dossier when the session changes a focused tool.
+7. Commit and push coherent changes.
+8. Verify the Vercel deployment when applicable.
 
 ## Source of truth
 

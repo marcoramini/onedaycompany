@@ -8,6 +8,10 @@ The format is intentionally lightweight.
 
 ### Added
 
+- Dedicated `docs/tools` documentation convention for focused product tools.
+- Initial Website Agent product, architecture, decision and roadmap dossier.
+- Initial Visual Asset Agent dossier and shared visual-capability boundary.
+
 - Guided Company Beginning that starts from interests, experience, knowledge, imagination or something the user wants to create.
 - One-company-at-a-time generation through a server-side Next.js API route.
 - Guided proposal refinement with quick suggestions and free-text direction.
@@ -38,6 +42,12 @@ The format is intentionally lightweight.
 - Corrective legacy capability migration with plan-level capability uniqueness.
 
 ### Changed
+
+- Reframed the public-presence milestone as a template-driven Website Agent
+  with structured, previewable changes instead of a visual page builder.
+- Moved logo, website imagery and campaign creative generation from the
+  Website Agent into a shared Visual Asset Agent and paused Website Agent
+  implementation until the shared asset contract is defined.
 
 - Replaced the old skills-first workflow with a non-evaluative Company Beginning.
 - Replaced three simultaneous Business Opportunities with one recommended company proposal at a time.
