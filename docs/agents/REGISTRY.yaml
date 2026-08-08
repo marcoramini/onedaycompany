@@ -90,6 +90,103 @@ agents:
       - website-agent
       - visual-asset-agent
 
+  - id: company-foundation
+    name: Company Foundation Agent
+    type: domain
+    lifecycle: definition
+    priority: immediate
+    implementation_order: 1
+    documentation: docs/agents/company-foundation/README.md
+    chat_starter: docs/agents/company-foundation/CHAT_STARTER.md
+    owns:
+      - company purpose, vision and mission semantics
+      - initial company concept and foundational value proposition
+      - impact proposals when accepted foundation elements change
+    must_not_own:
+      - first-offer detail and evolution
+      - launch plan steps and activities
+      - persistence or acceptance state
+    collaborates_with:
+      - company-orchestrator
+      - company-state
+      - knowledge-documentation
+      - governance-quality
+      - first-offer
+      - launch-planning
+      - workspace-generation-orchestrator
+
+  - id: first-offer
+    name: First Offer Agent
+    type: domain
+    lifecycle: definition
+    priority: immediate
+    implementation_order: 2
+    documentation: docs/agents/first-offer/README.md
+    chat_starter: docs/agents/first-offer/CHAT_STARTER.md
+    owns:
+      - first-offer promise, audience, scope and delivery semantics
+      - offer boundaries and initial price hypothesis when appropriate
+      - proposal of offer evolution and foundation impact warnings
+    must_not_own:
+      - company vision and mission
+      - launch plan steps and activities
+      - direct mutation of accepted foundation or company state
+    collaborates_with:
+      - company-foundation
+      - company-state
+      - knowledge-documentation
+      - governance-quality
+      - launch-planning
+      - workspace-generation-orchestrator
+
+  - id: launch-planning
+    name: Launch Planning Agent
+    type: domain
+    lifecycle: definition
+    priority: immediate
+    implementation_order: 3
+    documentation: docs/agents/launch-planning/README.md
+    chat_starter: docs/agents/launch-planning/CHAT_STARTER.md
+    owns:
+      - company-specific implementation of universal capabilities
+      - launch steps, activities and completion criteria semantics
+      - realistic low-cost path from accepted foundation and offer to launch
+    must_not_own:
+      - universal capability identifiers
+      - activity status, identifiers or timestamps
+      - company foundation or first-offer semantics
+    collaborates_with:
+      - company-foundation
+      - first-offer
+      - company-state
+      - knowledge-documentation
+      - governance-quality
+      - workspace-generation-orchestrator
+
+  - id: workspace-generation-orchestrator
+    name: Workspace Generation Orchestrator
+    type: integration
+    lifecycle: definition
+    priority: immediate
+    implementation_order: 4
+    documentation: docs/agents/workspace-generation-orchestrator/README.md
+    chat_starter: docs/agents/workspace-generation-orchestrator/CHAT_STARTER.md
+    owns:
+      - generation-stage orchestration and dependency execution
+      - persisted progress, retry and partial-result lifecycle
+      - workspace assembly and generation feedback contract
+    must_not_own:
+      - semantic generation rules of domain agents
+      - silent acceptance of generated proposals
+      - application-wide orchestration outside workspace generation
+    collaborates_with:
+      - company-foundation
+      - first-offer
+      - launch-planning
+      - company-state
+      - governance-quality
+      - knowledge-documentation
+
   - id: website-agent
     name: Website Agent
     type: tool

@@ -12,6 +12,8 @@ state that another chat can understand without relying on prior conversation.
 The registry distinguishes:
 
 - **governance agents**, which coordinate work, state, knowledge and quality;
+- **domain agents**, which own the meaning and evolution of a bounded part of
+  the company;
 - **tool agents**, which create or operate a bounded company asset for users;
 - **future domain agents**, which will own areas such as finance or legal work
   only when their product boundary and approval model are defined.
@@ -24,29 +26,36 @@ The registry distinguishes:
 | Company State Agent | Governance | Define now | `company-state/` |
 | Knowledge & Documentation Agent | Governance | Define now | `knowledge-documentation/` |
 | Governance & Quality Agent | Governance | Define now | `governance-quality/` |
+| Company Foundation Agent | Domain | Implement next | `company-foundation/` |
+| First Offer Agent | Domain | Implement after Foundation | `first-offer/` |
+| Launch Planning Agent | Domain | Implement after First Offer | `launch-planning/` |
+| Workspace Generation Orchestrator | Integration | Implement after agent contracts | `workspace-generation-orchestrator/` |
 | Website Agent | Tool | Already initiated | `../tools/website-agent/` |
 | Visual Asset Agent | Tool | Current design priority | `../tools/visual-asset-agent/` |
 
-This is deliberately a small initial set. Strategy remains a responsibility of
-the Company Orchestrator until its workload requires a separate agent. Brand is
-initially shared between the Visual Asset Agent and the consuming tool rather
-than introduced as an additional authority. Finance and Legal agents require a
-later, explicit definition of data ownership, risk and human approval.
+This initial set reflects responsibilities that already exist in the product or
+are required to split workspace generation safely. The Company Foundation Agent
+owns foundation semantics, while broader cross-company strategy remains a
+responsibility of the Company Orchestrator until it requires a separate agent.
+Brand is initially shared between the Visual Asset Agent and the consuming tool.
+Finance and Legal agents require a later, explicit definition of data ownership,
+risk and human approval.
 
 ## Files
 
 - [`REGISTRY.yaml`](REGISTRY.yaml) is the machine-readable agent inventory.
 - [`DOCUMENTATION_CONTRACT.md`](DOCUMENTATION_CONTRACT.md) defines the common
   documentation and handoff rules for every dedicated chat.
-- Each governance-agent directory contains its charter and chat starter.
+- Each governance, domain and integration-agent directory contains its charter
+  and chat starter.
 - Tool-agent dossiers remain under `docs/tools/`; their chat starters are
   listed in this document below.
 
 ## Starting a dedicated agent chat
 
-Use the prompt stored in the agent directory for governance agents. For tool
-agents, use the prompts below until a dedicated `CHAT_STARTER.md` is added to
-their existing dossier.
+Use the prompt stored in the agent directory for governance, domain and
+integration agents. For tool agents, use the prompts below until a dedicated
+`CHAT_STARTER.md` is added to their existing dossier.
 
 ### Website Agent
 
