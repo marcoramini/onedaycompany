@@ -20,8 +20,8 @@ export const workspaceGenerationStageStateSchema = z.object({
   attemptCount: z.number().int().nonnegative(),
   source: z.enum(["ai", "fallback"]).nullable(),
   safeError: z.string().nullable(),
-  startedAt: z.string().datetime().nullable(),
-  completedAt: z.string().datetime().nullable(),
+  startedAt: z.iso.datetime({ offset: true }).nullable(),
+  completedAt: z.iso.datetime({ offset: true }).nullable(),
 }).strict();
 
 export const workspaceGenerationStateSchema = z.object({
