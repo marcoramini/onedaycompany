@@ -27,7 +27,7 @@ test("workspace assembly assigns application-owned execution state without chang
 });
 
 test("workspace generation feedback requires all persisted stages", () => {
-  const stages = ["foundation", "first-offer", "launch-planning", "workspace-assembly"].map((stage) => ({
+  const stages = ["foundation", "first-offer", "launch-planning", "workspace-assembly", "visual-assets"].map((stage) => ({
     stage,
     status: "pending",
     attemptCount: 0,
@@ -46,12 +46,12 @@ test("workspace generation feedback requires all persisted stages", () => {
     id: "d0c47e53-a61b-4274-a9d0-1d1a7fb52d0a",
     companyId: "7d8f5b48-d0b0-4c91-a94e-299ed7d9feaf",
     status: "pending",
-    stages: stages.slice(0, 3),
+    stages: stages.slice(0, 4),
   }).success, false);
 });
 
 test("workspace generation accepts PostgreSQL timestamps with a UTC offset", () => {
-  const stages = ["foundation", "first-offer", "launch-planning", "workspace-assembly"].map((stage) => ({
+  const stages = ["foundation", "first-offer", "launch-planning", "workspace-assembly", "visual-assets"].map((stage) => ({
     stage,
     status: "completed",
     attemptCount: 1,

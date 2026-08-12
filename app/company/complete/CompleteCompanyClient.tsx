@@ -127,7 +127,7 @@ function CreationStep({ label, state }: { label: string; state: "pending" | "run
 }
 
 function stageLabel(stage: WorkspaceGenerationState["stages"][number]["stage"]) {
-  return { foundation: "Shaping your company foundation", "first-offer": "Defining your first offer", "launch-planning": "Organizing your simplest path to launch", "workspace-assembly": "Preparing your company workspace" }[stage];
+  return { foundation: "Shaping your company foundation", "first-offer": "Defining your first offer", "launch-planning": "Organizing your simplest path to launch", "workspace-assembly": "Preparing your company workspace", "visual-assets": "Creating your visual identity" }[stage];
 }
 
 async function readApiResponse<T>(response: Response): Promise<ApiBody<T>> {

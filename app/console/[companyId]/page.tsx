@@ -16,6 +16,7 @@ import ConsoleShell from "../../components/console/ConsoleShell";
 import ConsoleSidebar from "../../components/console/ConsoleSidebar";
 import ConsoleUserArea from "../../components/console/ConsoleUserArea";
 import OpenedCompanyTracker from "../../components/console/OpenedCompanyTracker";
+import VisualAssetsRecovery from "../../components/console/VisualAssetsRecovery";
 import {
   getCompanyVisualAssets,
   getCompanyExecutionPlan,
@@ -233,6 +234,8 @@ export default async function CompanyConsolePage({
           />
         }
       >
+        {!logo || !workspaceBackground ? <VisualAssetsRecovery companyId={typedCompany.id} /> : null}
+
         <CompanyConsoleHeader
           name={typedCompany.name}
           tagline={typedCompany.tagline}

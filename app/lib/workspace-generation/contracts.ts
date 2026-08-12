@@ -5,6 +5,7 @@ export const workspaceGenerationStageSchema = z.enum([
   "first-offer",
   "launch-planning",
   "workspace-assembly",
+  "visual-assets",
 ]);
 
 export const workspaceGenerationStatusSchema = z.enum([
@@ -28,7 +29,7 @@ export const workspaceGenerationStateSchema = z.object({
   id: z.string().uuid(),
   companyId: z.string().uuid(),
   status: workspaceGenerationStatusSchema,
-  stages: z.array(workspaceGenerationStageStateSchema).length(4),
+  stages: z.array(workspaceGenerationStageStateSchema).length(5),
 }).strict();
 
 export type WorkspaceGenerationStage = z.infer<typeof workspaceGenerationStageSchema>;

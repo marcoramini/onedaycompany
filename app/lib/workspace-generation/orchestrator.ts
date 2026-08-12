@@ -6,6 +6,7 @@ import { firstOfferProposalSchema } from "../first-offer/contracts";
 import { generateFirstOfferProposal } from "../first-offer/generator";
 import { generateLaunchPlanningProposal } from "../launch-planning/generator";
 import { launchPlanningProposalSchema } from "../launch-planning/contracts";
+import { ensureInitialVisualAssetsForCompany } from "../visual-asset-agent/createInitialVisualAssets";
 
 import { assembleWorkspaceExecutionPlan } from "./assembly";
 import type { WorkspaceGenerationStage, WorkspaceGenerationState } from "./contracts";
@@ -27,7 +28,7 @@ export async function runWorkspaceGeneration(input: {
 }): Promise<WorkspaceGenerationState> {
   const { supabase, companyId, userContext } = input;
   let state = await ensureWorkspaceGeneration(supabase, companyId);
-  if (state.status === "completed") return state;
+  if (state.status === "completed" && state.stages.every((stage) => stage.status === "completed")) return state;
 
   try {
     const foundation = await runStage({
@@ -58,6 +59,20 @@ export async function runWorkspaceGeneration(input: {
       const plan = assembleWorkspaceExecutionPlan({ companyId, proposal: launchPlan, source });
       const planId = await persistWorkspaceExecutionPlan(supabase, plan);
       await markWorkspaceGenerationStageCompleted(supabase, companyId, "workspace-assembly", { executionPlanId: planId }, source);
+    }
+
+    state = await requireState(supabase, companyId);
+    const visualAssetsStage = findStage(state, "visual-assets");
+    if (visualAssetsStage.status !== "completed") {
+      await markWorkspaceGenerationStageRunning(supabase, companyId, "visual-assets");
+      await ensureInitialVisualAssetsForCompany(supabase, companyId);
+      await markWorkspaceGenerationStageCompleted(
+        supabase,
+        companyId,
+        "visual-assets",
+        { assetPurposes: ["company-logo", "workspace-background"] },
+        null,
+      );
     }
     await completeWorkspaceGeneration(supabase, companyId);
   } catch (error) {

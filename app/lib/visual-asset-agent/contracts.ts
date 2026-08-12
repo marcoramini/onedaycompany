@@ -11,6 +11,7 @@ export const assetPurposeSchema = z.enum([
 export const assetBriefSchema = z.object({
   requestingTool: z.enum([
     "company-creation",
+    "workspace-generation",
     "brand-workflow",
     "website-agent",
     "promotion-agent",

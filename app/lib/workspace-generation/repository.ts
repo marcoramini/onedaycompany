@@ -13,6 +13,7 @@ const stages: WorkspaceGenerationStage[] = [
   "first-offer",
   "launch-planning",
   "workspace-assembly",
+  "visual-assets",
 ];
 
 type GenerationRow = {

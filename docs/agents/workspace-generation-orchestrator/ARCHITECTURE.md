@@ -9,6 +9,7 @@ selected persisted Company + durable user context
   -> first-offer stage (validated draft)
   -> launch-planning stage (validated draft)
   -> application-owned execution-plan assembly
+  -> visual-assets stage (logo and workspace background)
   -> completed workspace
 ```
 
@@ -19,14 +20,16 @@ producer's schema before using them downstream.
 
 ## Persistence and recovery
 
-Migration `008_workspace_generation.sql` creates one generation run per
-company and four child stage records. The stage record owns lifecycle status,
+Migrations `008_workspace_generation.sql` and
+`009_visual_assets_generation_stage.sql` create one generation run per
+company and five child stage records. The stage record owns lifecycle status,
 attempt count, timestamps, safe failure text, generation source and the
 validated draft result. It is protected by company ownership RLS.
 
 Completed stages are reused on retry. A failed or unfinished stage is retried
 without calling completed dependencies. Assembly checks for an existing
-version-1 Execution Plan, so a retry cannot silently replace completed work.
+version-1 Execution Plan, while visual asset generation checks each required
+purpose independently. A retry therefore cannot silently replace completed work.
 
 ## Feedback boundary
 
