@@ -10,7 +10,11 @@ import { BUSINESS_OPPORTUNITIES_SYSTEM_PROMPT } from "./prompts/businessOpportun
 const BUSINESS_OPPORTUNITIES_JSON_SCHEMA = {
   type: "object",
   properties: {
-    company: {
+    companies: {
+      type: "array",
+      minItems: 3,
+      maxItems: 3,
+      items: {
       type: "object",
       properties: {
         id: {
@@ -140,9 +144,10 @@ const BUSINESS_OPPORTUNITIES_JSON_SCHEMA = {
         "startupCost",
       ],
       additionalProperties: false,
+      },
     },
   },
-  required: ["company"],
+  required: ["companies"],
   additionalProperties: false,
 } as const;
 
@@ -174,37 +179,17 @@ Startup cost: ${company.startupCost}
 
 function buildGenerationInput(
   context: string,
-  previousCompany?: Company,
-  refinementRequest?: string,
+  previousCompanies?: Company[],
 ): string {
-  if (
-    previousCompany &&
-    refinementRequest
-  ) {
+  if (previousCompanies?.length) {
     return `
 User context:
 
 ${context}
 
-Current company:
+Previously shown directions. Generate three genuinely different alternatives:
 
-${formatCompanyForPrompt(previousCompany)}
-
-Refinement request:
-
-${refinementRequest}
-    `.trim();
-  }
-
-  if (previousCompany) {
-    return `
-User context:
-
-${context}
-
-Previous company:
-
-${formatCompanyForPrompt(previousCompany)}
+${previousCompanies.map((company, index) => `Direction ${index + 1}:\n${formatCompanyForPrompt(company)}`).join("\n\n")}
     `.trim();
   }
 
@@ -217,9 +202,8 @@ ${context}
 
 export async function generateAiBusinessOpportunities(
   context: string,
-  previousCompany?: Company,
-  refinementRequest?: string,
-): Promise<CompanyOutput> {
+  previousCompanies?: Company[],
+): Promise<CompanyOutput[]> {
   const normalizedContext = context.trim();
 
   if (!normalizedContext) {
@@ -227,9 +211,6 @@ export async function generateAiBusinessOpportunities(
       "A starting context is required.",
     );
   }
-
-  const normalizedRefinementRequest =
-    refinementRequest?.trim();
 
   const response = await openai.responses.create({
     model: "gpt-5",
@@ -239,8 +220,7 @@ export async function generateAiBusinessOpportunities(
 
     input: buildGenerationInput(
       normalizedContext,
-      previousCompany,
-      normalizedRefinementRequest,
+      previousCompanies,
     ),
 
     reasoning: {
@@ -252,7 +232,7 @@ export async function generateAiBusinessOpportunities(
     text: {
       format: {
         type: "json_schema",
-        name: "company",
+        name: "company_directions",
         strict: true,
         schema:
           BUSINESS_OPPORTUNITIES_JSON_SCHEMA,
@@ -295,5 +275,5 @@ export async function generateAiBusinessOpportunities(
       parsedOutput,
     );
 
-  return validatedOutput.company;
+  return validatedOutput.companies;
 }

@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { savePendingCompany } from "../api/companies/pendingCompany";
-import { generateBusinessOpportunity } from "../lib/businessOpportunitiesService";
+import { generateBusinessOpportunities } from "../lib/businessOpportunitiesService";
 import type { CompanyExecutionPlan } from "../lib/executionPlanSchema";
 import { createClient } from "../lib/supabase/client";
 import type { Company } from "../types/business";
@@ -17,7 +17,6 @@ import BusinessOpportunitiesScreen from "./BusinessOpportunitiesScreen";
 import CompanyBeginning from "./CompanyBeginning";
 import CompanyCreationLoading from "./CompanyCreationLoading";
 import ExecutionPlanScreen from "./ExecutionPlanScreen";
-import RefinementDrawer from "./RefinementDrawer";
 
 type FlowScreen =
   | "beginning"
@@ -45,13 +44,13 @@ export default function NewCompanyFlow({
   const [company, setCompany] =
     useState<Company | null>(null);
 
+  const [companies, setCompanies] =
+    useState<Company[]>([]);
+
   const [executionPlan, setExecutionPlan] =
     useState<CompanyExecutionPlan | null>(null);
 
   const [isGenerating, setIsGenerating] =
-    useState(false);
-
-  const [isRefinementOpen, setIsRefinementOpen] =
     useState(false);
 
   const [error, setError] =
@@ -76,12 +75,13 @@ export default function NewCompanyFlow({
     setCurrentScreen("loading");
 
     try {
-      const generatedCompany =
-        await generateBusinessOpportunity(
+      const generatedCompanies =
+        await generateBusinessOpportunities(
           normalizedContext,
         );
 
-      setCompany(generatedCompany);
+      setCompanies(generatedCompanies);
+      setCompany(null);
       setCurrentScreen("opportunity");
     } catch (generationError) {
       console.error(
@@ -103,14 +103,13 @@ export default function NewCompanyFlow({
 
   async function handleTryDifferentDirection() {
     if (
-      !company ||
       !beginningContext ||
       isGenerating
     ) {
       return;
     }
 
-    const previousCompany = company;
+    const previousCompanies = companies;
 
     setExecutionPlan(null);
     setIsGenerating(true);
@@ -118,13 +117,13 @@ export default function NewCompanyFlow({
     setCurrentScreen("loading");
 
     try {
-      const generatedCompany =
-        await generateBusinessOpportunity(
+      const generatedCompanies =
+        await generateBusinessOpportunities(
           beginningContext,
-          previousCompany,
+          previousCompanies,
         );
 
-      setCompany(generatedCompany);
+      setCompanies(generatedCompanies);
       setCurrentScreen("opportunity");
     } catch (generationError) {
       console.error(
@@ -144,70 +143,21 @@ export default function NewCompanyFlow({
     }
   }
 
-  async function handleRefineCompany(
-    refinementRequest: string,
-  ) {
+  async function handleChooseCompany(selectedCompany: Company) {
     if (
-      !company ||
       !beginningContext ||
       isGenerating
     ) {
       return;
     }
 
-    const currentCompany = company;
-
-    setExecutionPlan(null);
-    setIsRefinementOpen(false);
-    setIsGenerating(true);
-    setError(null);
-    setCurrentScreen("loading");
-
-    try {
-      const refinedCompany =
-        await generateBusinessOpportunity(
-          beginningContext,
-          currentCompany,
-          refinementRequest,
-        );
-
-      setCompany(refinedCompany);
-      setCurrentScreen("opportunity");
-    } catch (refinementError) {
-      console.error(
-        "Company refinement failed.",
-        refinementError,
-      );
-
-      setError(
-        refinementError instanceof Error
-          ? refinementError.message
-          : "We couldn't refine this proposal.",
-      );
-
-      setCurrentScreen("opportunity");
-      setIsRefinementOpen(true);
-    } finally {
-      setIsGenerating(false);
-    }
-  }
-
-  async function handleChooseCompany() {
-    if (
-      !company ||
-      !beginningContext ||
-      isGenerating
-    ) {
-      return;
-    }
-
+    setCompany(selectedCompany);
     savePendingCompany(
-      company,
+      selectedCompany,
       beginningContext,
     );
 
     setError(null);
-    setIsRefinementOpen(false);
     setIsGenerating(true);
 
     try {
@@ -246,7 +196,6 @@ export default function NewCompanyFlow({
     }
 
     setError(null);
-    setIsRefinementOpen(false);
     setCurrentScreen("beginning");
   }
 
@@ -270,10 +219,10 @@ export default function NewCompanyFlow({
     setCurrentScreen("beginning");
     setBeginningContext("");
     setCompany(null);
+    setCompanies([]);
     setExecutionPlan(null);
     setError(null);
     setIsGenerating(false);
-    setIsRefinementOpen(false);
   }
 
   if (currentScreen === "beginning") {
@@ -294,36 +243,19 @@ export default function NewCompanyFlow({
 
   if (
     currentScreen === "opportunity" &&
-    company
+    companies.length === 3
   ) {
     return (
-      <>
         <BusinessOpportunitiesScreen
-          company={company}
+          companies={companies}
           isGenerating={isGenerating}
           error={error}
           onBack={handleBackToBeginning}
           onChooseCompany={handleChooseCompany}
-          onRefineProposal={() => {
-            setError(null);
-            setIsRefinementOpen(true);
-          }}
-          onTryDifferentDirection={
+          onGenerateMore={
             handleTryDifferentDirection
           }
         />
-
-        {isRefinementOpen ? (
-          <RefinementDrawer
-            isOpen
-            companyName={company.name}
-            onClose={() => {
-              setIsRefinementOpen(false);
-            }}
-            onSubmit={handleRefineCompany}
-          />
-        ) : null}
-      </>
     );
   }
 

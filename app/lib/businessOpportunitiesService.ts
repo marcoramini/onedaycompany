@@ -5,16 +5,15 @@ import {
 import type { Company } from "../types/business";
 
 type BusinessOpportunitiesApiResponse = {
-  company: unknown;
+  companies: unknown;
   source: "ai" | "fallback";
   error?: string;
 };
 
-export async function generateBusinessOpportunity(
+export async function generateBusinessOpportunities(
   context: string,
-  previousCompany?: Company,
-  refinementRequest?: string,
-): Promise<Company> {
+  previousCompanies?: Company[],
+): Promise<Company[]> {
   const response = await fetch(
     "/api/business-opportunities",
     {
@@ -24,8 +23,7 @@ export async function generateBusinessOpportunity(
       },
       body: JSON.stringify({
         context,
-        previousCompany,
-        refinementRequest,
+        previousCompanies,
       }),
     },
   );
@@ -45,5 +43,5 @@ export async function generateBusinessOpportunity(
     );
   }
 
-  return companySchema.parse(data.company);
+  return companySchema.array().length(3).parse(data.companies);
 }

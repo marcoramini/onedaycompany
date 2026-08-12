@@ -19,28 +19,26 @@ export async function POST(
 
     const {
       context,
-      previousCompany,
-      refinementRequest,
+      previousCompanies,
     } =
       businessOpportunitiesRequestSchema.parse(
         rawBody,
       );
 
     try {
-      const company =
+      const companies =
         await generateAiBusinessOpportunities(
           context,
-          previousCompany,
-          refinementRequest,
+          previousCompanies,
         );
 
       console.log(
         "Company generated with AI:",
-        company.name,
+        companies.map((company) => company.name).join(", "),
       );
 
       return NextResponse.json({
-        company: companySchema.parse(company),
+        companies: companySchema.array().length(3).parse(companies),
         source: "ai",
       });
     } catch (error) {
@@ -49,18 +47,18 @@ export async function POST(
         error,
       );
 
-      const company =
+      const companies =
         generateFallbackBusinessOpportunities(
           context,
         );
 
       console.warn(
         "Returning fallback company:",
-        company.name,
+        companies.map((company) => company.name).join(", "),
       );
 
       return NextResponse.json({
-        company: companySchema.parse(company),
+        companies: companySchema.array().length(3).parse(companies),
         source: "fallback",
       });
     }

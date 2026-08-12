@@ -59,21 +59,14 @@ export const companySchema = z.object({
 
 export const businessOpportunitiesResponseSchema =
   z.object({
-    company: companySchema,
+    companies: z.array(companySchema).length(3),
   });
 
 export const businessOpportunitiesRequestSchema =
   z.object({
     context: z.string().trim().min(1).max(4_000),
 
-    previousCompany: companySchema.optional(),
-
-    refinementRequest: z
-      .string()
-      .trim()
-      .min(1)
-      .max(2_000)
-      .optional(),
+    previousCompanies: z.array(companySchema).max(12).optional(),
   });
 
 export type CompanyOutput = z.infer<

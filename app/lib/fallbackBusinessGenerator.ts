@@ -15,10 +15,10 @@ function createCompanyId(context: string): string {
 
 export function generateFallbackBusinessOpportunities(
   context: string,
-): Company {
+): Company[] {
   const normalizedContext = context.trim();
 
-  return {
+  const base: Company = {
     id: createCompanyId(normalizedContext),
 
     name: "Common Thread",
@@ -59,4 +59,26 @@ export function generateFallbackBusinessOpportunities(
 
     startupCost: "very-low",
   };
+
+  return [
+    base,
+    {
+      ...base,
+      id: `${createCompanyId(normalizedContext)}-collective`,
+      name: "Open Practice",
+      tagline: "Make useful experience easier to share.",
+      mission: "Open Practice turns practical experience into small services that help a defined community make progress together.",
+      problem: "People with a shared challenge often lack a focused place to exchange grounded guidance and take the next step.",
+      solution: "Open Practice creates facilitated small-group experiences around one concrete challenge, combining peer learning with a clear action path.",
+    },
+    {
+      ...base,
+      id: `${createCompanyId(normalizedContext)}-lab`,
+      name: "Signal Kit",
+      tagline: "Turn complex know-how into tools people can use.",
+      mission: "Signal Kit transforms specialized knowledge into simple resources that help people act with more confidence and less friction.",
+      problem: "Useful expertise is often trapped in long explanations, making it difficult for people to apply when they need it most.",
+      solution: "Signal Kit packages one repeatable method into concise guides, templates, and focused support that customers can use immediately.",
+    },
+  ];
 }
