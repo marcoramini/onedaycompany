@@ -36,6 +36,11 @@ The new-company flow now checks the current Supabase user after the proposal is
 accepted. Authenticated users continue directly to `/company/complete`; only
 anonymous users see the Google authentication screen.
 
+The new-company Google flow uses the exact `/auth/callback` redirect URL. The
+callback's safe default continues to `/company/complete`; avoiding a query
+string keeps the redirect compatible with the exact Supabase Preview allow-list
+entry and preserves the pending company on the same origin.
+
 ## Implemented flow
 
 ```text

@@ -31,8 +31,7 @@ export default function SaveCompanyScreen({
       const supabase = createClient();
 
       const redirectTo =
-        `${window.location.origin}/auth/callback` +
-        "?next=/company/complete";
+        `${window.location.origin}/auth/callback`;
 
       const { error: signInError } =
         await supabase.auth.signInWithOAuth({
