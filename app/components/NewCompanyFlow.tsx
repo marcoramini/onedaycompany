@@ -2,11 +2,13 @@
 
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { savePendingCompany } from "../api/companies/pendingCompany";
 import { generateBusinessOpportunity } from "../lib/businessOpportunitiesService";
 import type { CompanyExecutionPlan } from "../lib/executionPlanSchema";
+import { createClient } from "../lib/supabase/client";
 import type { Company } from "../types/business";
 
 import Architect from "./Architect";
@@ -32,6 +34,8 @@ type NewCompanyFlowProps = {
 export default function NewCompanyFlow({
   onExit,
 }: NewCompanyFlowProps) {
+  const router = useRouter();
+
   const [currentScreen, setCurrentScreen] =
     useState<FlowScreen>("beginning");
 
@@ -188,7 +192,7 @@ export default function NewCompanyFlow({
     }
   }
 
-  function handleChooseCompany() {
+  async function handleChooseCompany() {
     if (
       !company ||
       !beginningContext ||
@@ -204,7 +208,31 @@ export default function NewCompanyFlow({
 
     setError(null);
     setIsRefinementOpen(false);
-    setCurrentScreen("authentication");
+    setIsGenerating(true);
+
+    try {
+      const supabase = createClient();
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
+
+      if (userError || !user) {
+        setCurrentScreen("authentication");
+        return;
+      }
+
+      router.push("/company/complete");
+    } catch (authenticationError) {
+      console.error(
+        "Existing authentication check failed.",
+        authenticationError,
+      );
+
+      setCurrentScreen("authentication");
+    } finally {
+      setIsGenerating(false);
+    }
   }
 
   function handleStartExecutionStep() {

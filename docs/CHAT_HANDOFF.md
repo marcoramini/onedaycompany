@@ -32,6 +32,10 @@ Communication with Marco is in Italian. Fixed public product copy is English.
 OneDayCompany is not a generic chatbot and every screen should retain one clear
 objective.
 
+The new-company flow now checks the current Supabase user after the proposal is
+accepted. Authenticated users continue directly to `/company/complete`; only
+anonymous users see the Google authentication screen.
+
 ## Implemented flow
 
 ```text
