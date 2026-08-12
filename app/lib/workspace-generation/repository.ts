@@ -55,7 +55,10 @@ export async function ensureWorkspaceGeneration(
   companyId: string,
 ): Promise<WorkspaceGenerationState> {
   const existing = await getWorkspaceGeneration(supabase, companyId);
-  if (existing) return existing;
+  if (existing) {
+    await ensureStageRows(supabase, existing.id);
+    return (await getWorkspaceGeneration(supabase, companyId)) ?? existing;
+  }
 
   const { data, error } = await supabase
     .from("workspace_generations")
@@ -66,18 +69,19 @@ export async function ensureWorkspaceGeneration(
   if (error) {
     if (error.code === "23505") {
       const concurrent = await getWorkspaceGeneration(supabase, companyId);
-      if (concurrent) return concurrent;
+      if (concurrent) {
+        await ensureStageRows(supabase, concurrent.id);
+        return (await getWorkspaceGeneration(supabase, companyId)) ?? concurrent;
+      }
     }
     throw new Error(`Workspace generation creation failed: ${error.message}`);
   }
 
-  const { error: stageError } = await supabase
-    .from("workspace_generation_stages")
-    .insert(stages.map((stage) => ({ generation_id: data.id, stage })));
-
-  if (stageError) {
+  try {
+    await ensureStageRows(supabase, data.id);
+  } catch (stageError) {
     await supabase.from("workspace_generations").delete().eq("id", data.id);
-    throw new Error(`Workspace generation stages creation failed: ${stageError.message}`);
+    throw stageError;
   }
 
   const created = await getWorkspaceGeneration(supabase, companyId);
@@ -256,9 +260,20 @@ function mapGeneration(row: GenerationRow): WorkspaceGenerationState {
     status: row.status,
     stages: stages.map((stage) => {
       const value = stagesByName.get(stage);
-      if (!value) throw new Error(`Workspace generation is missing the ${stage} stage.`);
+      if (!value) return { stage, status: "pending", attemptCount: 0, source: null,
+        safeError: null, startedAt: null, completedAt: null };
       return { stage, status: value.status, attemptCount: value.attempt_count, source: value.source,
         safeError: value.safe_error, startedAt: value.started_at, completedAt: value.completed_at };
     }),
   });
+}
+
+async function ensureStageRows(supabase: SupabaseClient, generationId: string) {
+  const { error } = await supabase
+    .from("workspace_generation_stages")
+    .upsert(
+      stages.map((stage) => ({ generation_id: generationId, stage })),
+      { onConflict: "generation_id,stage", ignoreDuplicates: true },
+    );
+  if (error) throw new Error(`Workspace generation stages creation failed: ${error.message}`);
 }
