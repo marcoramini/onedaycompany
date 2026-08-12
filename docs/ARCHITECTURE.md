@@ -91,6 +91,16 @@ persistence complete. Once saved, database state is authoritative.
 
 ## Execution Plan
 
+### Workspace Generation Orchestrator
+
+Initial workspace generation now persists a company-scoped run and four
+observable stages (Foundation, First Offer, Launch Planning and workspace
+assembly). The specialist outputs remain validated drafts in the run; the
+application assigns plan IDs, capability association, ordering and progress
+when it assembles execution-plan version 1. Retries reuse completed stages and
+do not overwrite an existing plan. The legacy execution-plan route remains
+available during this transition.
+
 The application defines seven canonical capabilities. AI generates one
 company-specific step per capability and two to five practical activities per
 step.

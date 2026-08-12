@@ -76,12 +76,17 @@ export async function POST(request: Request) {
         },
       );
 
-    await ensureCompanyExecutionPlan(
-      supabase,
-      company.id,
-      validationResult.data.company,
-      validationResult.data.beginningContext,
-    );
+    const workspaceGenerationEnabled =
+      process.env.WORKSPACE_GENERATION_ORCHESTRATOR_ENABLED === "true";
+
+    if (!workspaceGenerationEnabled) {
+      await ensureCompanyExecutionPlan(
+        supabase,
+        company.id,
+        validationResult.data.company,
+        validationResult.data.beginningContext,
+      );
+    }
 
     try {
       await ensureInitialVisualAssets(
@@ -99,6 +104,7 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         company,
+        workspaceGenerationEnabled,
       },
       {
         status: 201,

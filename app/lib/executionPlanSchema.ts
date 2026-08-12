@@ -4,8 +4,8 @@ import { z } from "zod";
 
 import {
   companySchema,
-} from "./businessOpportunitiesSchema";
-import { companyCapabilityIds } from "../types/companyCapability";
+} from "./businessOpportunitiesSchema.ts";
+import { companyCapabilityIds } from "../types/companyCapability.ts";
 
 export const companyCapabilityIdSchema = z.enum(
   companyCapabilityIds,

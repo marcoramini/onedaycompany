@@ -6,7 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test:foundation": "node --experimental-strip-types --test tests/company-foundation.test.mjs",
+    "test:first-offer": "node --experimental-strip-types --test tests/first-offer.test.mjs",
+    "test:launch-planning": "node --experimental-strip-types --test tests/launch-planning.test.mjs",
+    "test:workspace-generation": "node --experimental-strip-types --test tests/workspace-generation.test.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.4",

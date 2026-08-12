@@ -23,8 +23,17 @@ realistic path that moves the company toward launch, customers and revenue.
 ## Inputs and outputs
 
 Inputs are validated Foundation and First Offer proposals plus the
-application-owned capability catalog. The output contains semantic plan content
-only. The application assigns identifiers, state, version and timestamps.
+application-owned capability catalog. The output is a state-free
+`LaunchPlanningProposal`, defined in `app/lib/launch-planning/contracts.ts`.
+It contains an introduction and exactly seven steps with their practical
+activities and observable completion criteria. The application assigns
+identifiers, order, state, version and timestamps.
+
+The canonical First Offer input is the state-free `FirstOfferProposal` defined
+by `app/lib/first-offer/contracts.ts`. It supplies audience, desired outcome,
+promise, scope, delivery, boundaries, an optional price hypothesis,
+assumptions and Foundation impact warnings. The Launch Planning Agent must
+consume these fields without rewriting them or treating hypotheses as facts.
 
 ## Authority and approval
 
@@ -34,6 +43,7 @@ impact and acceptance rules.
 
 ## First implementation milestone
 
-Extract the execution-plan generation from the current combined flow into a
-dedicated prompt, structured schema, validation boundary, fallback and isolated
-tests consuming Foundation and First Offer contracts.
+The isolated generation boundary is complete. It deliberately leaves the
+combined execution-plan generator, persistence flow and UI unchanged. The
+Workspace Generation Orchestrator must invoke this module after Foundation and
+First Offer and perform the state-owned assembly.

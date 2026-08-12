@@ -42,8 +42,27 @@ animation. At minimum each stage supports `pending`, `running`, `completed` and
 `failed`, with attempt count and a safe user-facing status. Partial results are
 drafts until the workspace reaches its defined acceptance transition.
 
-## First implementation milestone
+## Current implementation milestone
 
-Replace the current combined workspace-generation path with the three agent
-contracts, persisted stage lifecycle, resumable failure handling and visible
-progress while preserving the current public product behavior.
+The first implementation is available behind the existing authenticated company
+creation flow. It preserves the selected legacy Company record and offer as the
+user's existing acceptance transition; it does not reinterpret them through
+the new domain agents. A persisted `workspace_generations` run then invokes
+Foundation, First Offer and Launch Planning sequentially, retaining each
+validated proposal as a draft stage result before assembling version 1 of the
+Execution Plan.
+
+`workspace_generation_stages` records `pending`, `running`, `completed` or
+`failed`, attempt count, timestamps, safe error text, source and validated
+partial result. Retrying resumes completed dependencies and reruns only the
+failed or unfinished stage. Workspace assembly never overwrites an existing
+version-1 plan.
+
+The completion screen polls this persisted lifecycle; its labels are derived
+from real stage state rather than elapsed-time animation. The old combined
+`/api/execution-plan` path and its generator remain intact for compatibility.
+
+Apply migration `008_workspace_generation.sql` after migrations 001–007 before
+enabling this flow in an environment. The default remains the legacy path;
+set `WORKSPACE_GENERATION_ORCHESTRATOR_ENABLED=true` only after applying the
+migration and completing an authenticated end-to-end verification.

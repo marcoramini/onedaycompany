@@ -2,6 +2,29 @@
 
 ## Current state
 
+### Workspace Generation Orchestrator
+
+The Workspace Generation Orchestrator implementation now lives in
+`app/lib/workspace-generation/`. Migration `008_workspace_generation.sql`
+adds ownership-protected generation runs and four persisted stages:
+Foundation, First Offer, Launch Planning and workspace assembly. The flow
+uses the existing selected Company as the user acceptance transition, stores
+specialist outputs as validated drafts, resumes only incomplete/failed stages,
+and never replaces an existing execution plan version 1.
+
+`/api/companies/[companyId]/workspace-generation` exposes authenticated GET
+progress and POST run/retry operations. `CompleteCompanyClient` polls that
+record instead of using simulated progress. The legacy execution-plan endpoint
+and generator remain present for safe rollback and compatibility. Production
+continues to use that legacy path by default; enable the new route only with
+`WORKSPACE_GENERATION_ORCHESTRATOR_ENABLED=true` after applying migration 008
+and passing authenticated E2E verification.
+
+Verification at handoff: lint, the three domain-contract suites, the new
+workspace-assembly suite and `next build` pass when invoked through local
+project binaries. The global `npm` launcher is broken in this environment, so
+equivalent local commands were used.
+
 The Company Workspace Home v1 graphical milestone is complete. The repository,
 not prior chat history, is the first source of truth.
 
