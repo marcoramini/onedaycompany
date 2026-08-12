@@ -63,6 +63,5 @@ from real stage state rather than elapsed-time animation. The old combined
 `/api/execution-plan` path and its generator remain intact for compatibility.
 
 Apply migration `008_workspace_generation.sql` after migrations 001–007 before
-enabling this flow in an environment. The default remains the legacy path;
-set `WORKSPACE_GENERATION_ORCHESTRATOR_ENABLED=true` only after applying the
-migration and completing an authenticated end-to-end verification.
+deploying this branch. Authenticated company creation always starts the new
+orchestrator; no environment flag can silently return it to the legacy path.

@@ -6,7 +6,6 @@ import {
 import {
   createCompanyWithOffer,
 } from "./companyRepository";
-import { ensureCompanyExecutionPlan } from "./companyExecutionPlanRepository";
 import { createClient } from "../../lib/supabase/server";
 import { ensureInitialVisualAssets } from "../../lib/visual-asset-agent/createInitialVisualAssets";
 
@@ -76,18 +75,6 @@ export async function POST(request: Request) {
         },
       );
 
-    const workspaceGenerationEnabled =
-      process.env.WORKSPACE_GENERATION_ORCHESTRATOR_ENABLED === "true";
-
-    if (!workspaceGenerationEnabled) {
-      await ensureCompanyExecutionPlan(
-        supabase,
-        company.id,
-        validationResult.data.company,
-        validationResult.data.beginningContext,
-      );
-    }
-
     try {
       await ensureInitialVisualAssets(
         supabase,
@@ -104,7 +91,6 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         company,
-        workspaceGenerationEnabled,
       },
       {
         status: 201,

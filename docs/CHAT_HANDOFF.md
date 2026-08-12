@@ -15,10 +15,10 @@ and never replaces an existing execution plan version 1.
 `/api/companies/[companyId]/workspace-generation` exposes authenticated GET
 progress and POST run/retry operations. `CompleteCompanyClient` polls that
 record instead of using simulated progress. The legacy execution-plan endpoint
-and generator remain present for safe rollback and compatibility. Production
-continues to use that legacy path by default; enable the new route only with
-`WORKSPACE_GENERATION_ORCHESTRATOR_ENABLED=true` after applying migration 008
-and passing authenticated E2E verification.
+and generator remain present for compatibility. On the experimental branch,
+authenticated company creation always starts the new orchestrator. Migration
+008 has been verified in the Preview Supabase environment; no feature flag is
+required.
 
 Verification at handoff: lint, the three domain-contract suites, the new
 workspace-assembly suite and `next build` pass when invoked through local

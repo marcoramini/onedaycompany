@@ -57,13 +57,8 @@ export default function CompleteCompanyClient({ userName }: CompleteCompanyClien
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ company: pendingCompany.company, beginningContext: pendingCompany.beginningContext }),
       });
-      const body = (await response.json()) as { company?: { id: string }; workspaceGenerationEnabled?: boolean; error?: string };
+      const body = (await response.json()) as { company?: { id: string }; error?: string };
       if (!response.ok || !body.company?.id) throw new Error(body.error ?? "We couldn't save your company.");
-      if (!body.workspaceGenerationEnabled) {
-        clearPendingCompany();
-        router.replace(`/console/${body.company.id}`);
-        return;
-      }
       setCompanyId(body.company.id);
       setGenerationContext(pendingCompany.beginningContext);
       clearPendingCompany();
@@ -72,7 +67,7 @@ export default function CompleteCompanyClient({ userName }: CompleteCompanyClien
       setErrorMessage(error instanceof Error ? error.message : "We couldn't save your company.");
       setCreationState("error");
     }
-  }, [router, startWorkspaceGeneration]);
+  }, [startWorkspaceGeneration]);
 
   useEffect(() => {
     if (creationStartedRef.current) return;

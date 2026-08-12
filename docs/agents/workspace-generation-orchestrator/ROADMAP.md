@@ -12,8 +12,9 @@
 
 ## Next
 
-- [ ] Apply migration 008 in each target Supabase environment, then set
-  `WORKSPACE_GENERATION_ORCHESTRATOR_ENABLED=true` only after verification.
+- [x] Apply migration 008 in the Preview Supabase environment.
+- [x] Make authenticated creation use the orchestrator unconditionally on the
+  experimental branch.
 - [ ] Exercise the authenticated browser flow against a migrated database,
   including a failed stage and retry.
 - [ ] Define canonical accepted Foundation and First Offer records with the

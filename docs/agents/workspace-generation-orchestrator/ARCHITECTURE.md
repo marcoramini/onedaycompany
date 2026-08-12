@@ -41,7 +41,7 @@ progress.
 The legacy Company persistence contract remains the initial user-selected
 company record. Foundation and First Offer results are persisted as generation
 drafts, not direct mutations of that accepted state. The legacy
-`/api/execution-plan` route and generator remain unchanged. The companies
-route uses the legacy execution-plan path unless
-`WORKSPACE_GENERATION_ORCHESTRATOR_ENABLED=true`; this gate protects current
-production until migration 008 and authenticated E2E verification are complete.
+`/api/execution-plan` route and generator remain available for compatibility,
+but authenticated creation on this experimental branch always continues through
+the Workspace Generation Orchestrator. Migration 008 is therefore required in
+every environment that deploys this branch.
