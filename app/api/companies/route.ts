@@ -7,7 +7,6 @@ import {
   createCompanyWithOffer,
 } from "./companyRepository";
 import { createClient } from "../../lib/supabase/server";
-import { ensureInitialVisualAssets } from "../../lib/visual-asset-agent/createInitialVisualAssets";
 
 export async function POST(request: Request) {
   const supabase = await createClient();
@@ -74,19 +73,6 @@ export async function POST(request: Request) {
           payload: validationResult.data,
         },
       );
-
-    try {
-      await ensureInitialVisualAssets(
-        supabase,
-        company.id,
-        validationResult.data.company,
-      );
-    } catch (brandError) {
-      console.error(
-        "Initial Visual Asset Agent run failed. The workspace will open without blocking.",
-        brandError,
-      );
-    }
 
     return NextResponse.json(
       {

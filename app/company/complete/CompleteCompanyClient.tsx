@@ -11,6 +11,7 @@ import type { WorkspaceGenerationState } from "../../lib/workspace-generation/co
 
 type CompleteCompanyClientProps = { userName: string };
 type CreationState = "creating" | "error";
+type ApiBody<T> = T & { error?: string };
 
 export default function CompleteCompanyClient({ userName }: CompleteCompanyClientProps) {
   const router = useRouter();
@@ -31,7 +32,7 @@ export default function CompleteCompanyClient({ userName }: CompleteCompanyClien
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userContext }),
       });
-      const body = (await response.json()) as { generation?: WorkspaceGenerationState; error?: string };
+      const body = await readApiResponse<{ generation?: WorkspaceGenerationState }>(response);
       if (!response.ok || !body.generation) throw new Error(body.error ?? "We couldn't prepare your workspace.");
       setGeneration(body.generation);
     } catch (error) {
@@ -57,7 +58,7 @@ export default function CompleteCompanyClient({ userName }: CompleteCompanyClien
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ company: pendingCompany.company, beginningContext: pendingCompany.beginningContext }),
       });
-      const body = (await response.json()) as { company?: { id: string }; error?: string };
+      const body = await readApiResponse<{ company?: { id: string } }>(response);
       if (!response.ok || !body.company?.id) throw new Error(body.error ?? "We couldn't save your company.");
       setCompanyId(body.company.id);
       setGenerationContext(pendingCompany.beginningContext);
@@ -80,7 +81,7 @@ export default function CompleteCompanyClient({ userName }: CompleteCompanyClien
     const poll = async () => {
       try {
         const response = await fetch(`/api/companies/${companyId}/workspace-generation`, { cache: "no-store" });
-        const body = (await response.json()) as { generation?: WorkspaceGenerationState; error?: string };
+        const body = await readApiResponse<{ generation?: WorkspaceGenerationState }>(response);
         if (!response.ok) throw new Error(body.error ?? "We couldn't check workspace progress.");
         if (body.generation) setGeneration(body.generation);
       } catch (error) {
@@ -127,4 +128,21 @@ function CreationStep({ label, state }: { label: string; state: "pending" | "run
 
 function stageLabel(stage: WorkspaceGenerationState["stages"][number]["stage"]) {
   return { foundation: "Shaping your company foundation", "first-offer": "Defining your first offer", "launch-planning": "Organizing your simplest path to launch", "workspace-assembly": "Preparing your company workspace" }[stage];
+}
+
+async function readApiResponse<T>(response: Response): Promise<ApiBody<T>> {
+  const text = await response.text();
+  if (!text.trim()) {
+    throw new Error(
+      response.ok
+        ? "The server returned an empty response. Please try again."
+        : `The server couldn't complete the request (HTTP ${response.status}). Please try again.`,
+    );
+  }
+
+  try {
+    return JSON.parse(text) as ApiBody<T>;
+  } catch {
+    throw new Error(`The server returned an invalid response (HTTP ${response.status}). Please try again.`);
+  }
 }

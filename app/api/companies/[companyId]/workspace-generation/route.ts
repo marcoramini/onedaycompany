@@ -6,6 +6,7 @@ import { createClient } from "../../../../lib/supabase/server";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+export const maxDuration = 300;
 
 type RouteContext = { params: Promise<{ companyId: string }> };
 
@@ -35,12 +36,20 @@ export async function POST(request: Request, context: RouteContext) {
     return NextResponse.json({ error: "Company context is required." }, { status: 400 });
   }
 
-  const generation = await runWorkspaceGeneration({
-    supabase: authorization.supabase,
-    companyId: authorization.companyId,
-    userContext,
-  });
-  return NextResponse.json({ generation });
+  try {
+    const generation = await runWorkspaceGeneration({
+      supabase: authorization.supabase,
+      companyId: authorization.companyId,
+      userContext,
+    });
+    return NextResponse.json({ generation });
+  } catch (error) {
+    console.error("Workspace generation failed.", error);
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "We couldn't prepare your workspace." },
+      { status: 500 },
+    );
+  }
 }
 
 async function authorize(context: RouteContext) {
